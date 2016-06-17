@@ -1,5 +1,10 @@
 "use strict"
 
 module.exports = function (server) {
-    require("./commonRoute")(server)
+    server.get('/', (req, res, next) => {
+        res.send("welcome duomiduo backend api server...")
+    });
+
+    require("./common")(server)
+    require("./user")(server)
 }

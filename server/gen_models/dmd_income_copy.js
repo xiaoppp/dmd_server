@@ -1,54 +1,54 @@
 /* jshint indent: 2 */
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('dmd_apply_help', {
+  return sequelize.define('dmd_income_copy', {
     id: {
       type: DataTypes.INTEGER(10),
       allowNull: false,
       primaryKey: true,
       autoIncrement: true
     },
-    code: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
     member_id: {
       type: DataTypes.INTEGER(10),
       allowNull: true
-    },
-    money: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-      defaultValue: '0.00'
-    },
-    the_time: {
-      type: DataTypes.INTEGER(10),
-      allowNull: true
-    },
-    end_time: {
-      type: DataTypes.INTEGER(10),
-      allowNull: true
-    },
-    state: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: '1'
     },
     type: {
       type: DataTypes.STRING,
       allowNull: true
     },
-    scramble: {
-      type: DataTypes.INTEGER(1),
+    money: {
+      type: DataTypes.FLOAT,
+      allowNull: true
+    },
+    intro: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    the_time: {
+      type: DataTypes.INTEGER(10),
+      allowNull: true
+    },
+    ice: {
+      type: DataTypes.INTEGER(10),
       allowNull: true,
       defaultValue: '0'
     },
-    match_all: {
+    offer_id: {
+      type: DataTypes.INTEGER(10),
+      allowNull: true,
+      defaultValue: '0'
+    },
+    apply_id: {
+      type: DataTypes.INTEGER(10),
+      allowNull: true,
+      defaultValue: '0'
+    },
+    err: {
       type: DataTypes.INTEGER(1),
       allowNull: true,
       defaultValue: '0'
     }
   }, {
-    tableName: 'dmd_apply_help'
+    tableName: 'dmd_income_copy'
   });
 };

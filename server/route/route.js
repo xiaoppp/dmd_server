@@ -6,5 +6,5 @@ module.exports = function (server) {
     });
 
     require("./common")(server)
-    require("./user")(server)
+    require("./news")(server)
 }

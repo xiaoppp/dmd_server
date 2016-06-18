@@ -7,4 +7,5 @@ module.exports = function (server) {
 
     require("./common")(server)
     require("./news")(server)
+    require("./messages")(server)
 }

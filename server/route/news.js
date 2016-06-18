@@ -5,8 +5,8 @@ const path = require('path')
 const models  = require('../mysql/index')
 
 module.exports = function(server) {
+    server.get('/api/news/page/:page', findNewsList)
     server.get('/api/news/:newsid', findNewsById)
-    server.get('/api/news', findNewsList)
 }
 
 const findNewsById = (req, res, next) => {
@@ -16,7 +16,11 @@ const findNewsById = (req, res, next) => {
 }
 
 const findNewsList = (req, res, next) => {
-    models.dmd_news.findAll().then(news => {
+    const page = req.params.page - 1
+    models.dmd_news.findAndCountAll({
+        limit: 10,
+        offset: 10 * page
+    }).then(news => {
         res.send(news)
     })
 }

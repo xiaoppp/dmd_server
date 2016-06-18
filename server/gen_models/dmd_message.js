@@ -47,6 +47,7 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: '0'
     }
   }, {
-    tableName: 'dmd_message'
+    tableName: 'dmd_message',
+    timestamps: false
   });
 };

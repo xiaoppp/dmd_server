@@ -13,5 +13,9 @@
     signin: {
         url: "http://localhost:3000/api/member/signin",
         json: {"username":"fdsf","pwd":"tadd"}
+    },
+    signup: {
+        url: "http://localhost:3000/api/member/signup",
+        json: {"refer":"13994236373", "username":"12399999999", "pwd": "123", "pay_pwd": "123"}
     }
 }

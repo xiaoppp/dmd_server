@@ -19,8 +19,29 @@ const APIResult = () => {
     }
 }
 
+const fail = (res, errorMessage, code=0) => {
+    const message = {
+        isSuccess: false,
+        error: {
+            message: errorMessage,
+            code: code
+        }
+    }
+    res.send(message)
+}
+
+const success = (res, data={}) => {
+    const message = {
+        isSuccess: true,
+        data: data
+    }
+    res.send(message)
+}
+
 const util = {
     getMD5: getMD5,
+    success: success,
+    fail: fail,
     APIResult: APIResult
 }
 

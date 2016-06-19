@@ -15,15 +15,12 @@ server.use(restify.gzipResponse())
 server.use(restify.bodyParser())
 //server.use(restify.requestExpiry());
 
-
-
-
 // add route
 require('./route/route')(server)
 
 // add all models
-require('./mysql/index')
-
+const models = require('./mysql/index')
+require('./mysql/model_extention')
 
 server.listen(3000, function() {
     console.log('%s listening at %s', server.name, server.url)

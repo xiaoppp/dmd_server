@@ -2,6 +2,7 @@
 const co = require('co')
 const models = require('../mysql/index')
 const config = require('../config/config.json')
+const util = require('../util/util')
 
 module.exports = function(server) {
     server.get('/api/messages/page/:memberid/:page', findMessagesList)
@@ -17,59 +18,52 @@ const findMessagesList = (req, res, next) => {
 
     const size = config.pagination.size
 
-    models.dmd_message.findAndCountAll({
-        where: {
-            to_member_id: to_member_id
-        },
-        limit: size,
-        offset: size * page
-    }).then(messages => {
-        res.send(messages)
-    })
+    models.dmd_message
+        .findAndCountAll({
+            where: {
+                to_member_id: to_member_id
+            },
+            limit: size,
+            offset: size * page
+        })
+        .then(m => util.success(res, m))
+        .catch(error => util.fail(res, error))
 }
-
 
 const replyMessages = (req, res, next) => {
     const member_id = req.params.memberid
 
     co(function*() {
-        const messages = yield models.dmd_message.findAll({
-            where: {
-                member_id: member_id
-            }
-        })
+            const messages = yield models.dmd_message.findAll({
+                where: {
+                    member_id: member_id
+                }
+            })
 
-        const replys = yield messages.map(function*(m) {
-            console.log(m.reply)
-            const reply = yield models.dmd_message.findById(m.reply)
-            return {
-                "old": m,
-                "new": reply
-            }
+            const replys = yield messages.map(function*(m) {
+                console.log(m.reply)
+                const reply = yield models.dmd_message.findById(m.reply)
+                return {
+                    "old": m,
+                    "new": reply
+                }
+            })
+            return replys
         })
-
-        res.send(replys)
-    })
-    .then(() => {})
-    .catch(error => res.send("failed"))
+        .then(m => util.success(res, m))
+        .catch(error => util.fail(res, error))
 }
 
 const findMessagesById = (req, res, next) => {
-    models.dmd_message.findById(req.params.id).then(messages => {
-        // todo:  messages is null will report error need to check later
-        messages = messages || []
-        res.send(messages)
-    })
+    models.dmd_message
+        .findById(req.params.id)
+        .then(m => util.success(res, m))
+        .catch(error => util.fail(res, error))
 }
 
 const saveMessage = (req, res, next) => {
-    console.log(req.params)
-    console.log(req.body)
-
     const leavemsg = models.dmd_message
         .create(req.params)
-        .then(function(message) {
-            res.send(message)
-        })
-        .catch(error => res.send("failed"))
+        .then(m => util.success(res, m))
+        .catch(error => util.fail(res, error))
 }

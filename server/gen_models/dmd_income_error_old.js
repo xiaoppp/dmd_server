@@ -49,6 +49,7 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: '1'
     }
   }, {
-    tableName: 'dmd_income_error_old'
+    tableName: 'dmd_income_error_old',
+    timestamps: false
   });
 };

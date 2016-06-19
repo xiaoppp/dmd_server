@@ -54,6 +54,7 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: '0'
     }
   }, {
-    tableName: 'dmd_apply_help'
+    tableName: 'dmd_apply_help',
+    timestamps: false
   });
 };

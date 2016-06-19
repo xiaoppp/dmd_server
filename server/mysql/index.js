@@ -10,7 +10,7 @@ const config = require(path.join(__dirname, '..', 'config', 'config.json'))[env]
 const sequelize = new Sequelize('duomiduo', 'root', '', {
     host: config.host,
     dialect: config.dialect,
-    timestamps: true,
+    timestamps: false,
     pool: {
         max: 20,
         min: 0,
@@ -38,6 +38,7 @@ fs
     .forEach(function(file) {
         const modelsFile = path.join(modelsDir, file)
         const model = sequelize.import(modelsFile)
+
         db[model.name] = model
     })
 

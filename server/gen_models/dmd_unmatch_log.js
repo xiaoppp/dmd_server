@@ -90,6 +90,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     }
   }, {
-    tableName: 'dmd_unmatch_log'
+    tableName: 'dmd_unmatch_log',
+    timestamps: false
   });
 };

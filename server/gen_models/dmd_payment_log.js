@@ -34,6 +34,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     }
   }, {
-    tableName: 'dmd_payment_log'
+    tableName: 'dmd_payment_log',
+    timestamps: false
   });
 };

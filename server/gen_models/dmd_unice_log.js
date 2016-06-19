@@ -21,6 +21,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     }
   }, {
-    tableName: 'dmd_unice_log'
+    tableName: 'dmd_unice_log',
+    timestamps: false
   });
 };

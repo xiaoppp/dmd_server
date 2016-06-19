@@ -1,5 +1,3 @@
-/* jshint indent: 2 */
-
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('dmd_members', {
     id: {
@@ -168,6 +166,7 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: '0'
     }
   }, {
-    tableName: 'dmd_members'
+    tableName: 'dmd_members',
+    timestamps: false
   });
 };

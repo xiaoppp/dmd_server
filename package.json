@@ -18,14 +18,14 @@
     "node": "4.x.x"
   },
   "dependencies": {
-    "mongoose": "^4.4.19",
+    "co": "^4.6.0",
     "crypto": "0.0.3",
     "moment": "^2.13.0",
+    "mongoose": "^4.4.19",
     "mysql": "^2.11.1",
     "request": "^2.72.0",
     "restify": "^4.1.0",
     "sequelize": "^3.23.3",
-    "underscore": "^1.8.3",
-    "co": "^4.6.0"
+    "underscore": "^1.8.3"
   }
 }

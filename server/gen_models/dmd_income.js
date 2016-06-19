@@ -49,6 +49,7 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: '0'
     }
   }, {
-    tableName: 'dmd_income'
+    tableName: 'dmd_income',
+    timestamps: false
   });
 };

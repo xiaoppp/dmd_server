@@ -33,6 +33,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     }
   }, {
-    tableName: 'dmd_admin_modify_active_log'
+    tableName: 'dmd_admin_modify_active_log',
+    timestamps: false
   });
 };

@@ -1,9 +1,7 @@
 "use strict"
 const co = require('co')
-const path = require('path')
-const _ = require('underscore')
-
 const models = require('../mysql/index')
+const config = require('../config/config.json')
 
 module.exports = function(server) {
     server.get('/api/messages/page/:memberid/:page', findMessagesList)
@@ -17,12 +15,14 @@ const findMessagesList = (req, res, next) => {
     const to_member_id = req.params.memberid
     const page = req.params.page - 1
 
+    const size = config.pagination.size
+
     models.dmd_message.findAndCountAll({
         where: {
             to_member_id: to_member_id
         },
-        limit: 10,
-        offset: 10 * page
+        limit: size,
+        offset: size * page
     }).then(messages => {
         res.send(messages)
     })
@@ -67,8 +67,7 @@ const saveMessage = (req, res, next) => {
     console.log(req.body)
 
     const leavemsg = models.dmd_message
-        .build(req.params)
-        .save()
+        .create(req.params)
         .then(function(message) {
             res.send(message)
         })

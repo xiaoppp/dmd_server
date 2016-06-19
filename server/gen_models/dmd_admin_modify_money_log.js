@@ -38,6 +38,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     }
   }, {
-    tableName: 'dmd_admin_modify_money_log'
+    tableName: 'dmd_admin_modify_money_log',
+    timestamps: false
   });
 };

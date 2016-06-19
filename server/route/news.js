@@ -1,8 +1,7 @@
 "use strict"
 const co = require('co')
-const path = require('path')
-
 const models  = require('../mysql/index')
+const config = require('../config/config.json')
 
 module.exports = function(server) {
     server.get('/api/news/page/:page', findNewsList)
@@ -17,9 +16,12 @@ const findNewsById = (req, res, next) => {
 
 const findNewsList = (req, res, next) => {
     const page = req.params.page - 1
+
+    const size = config.pagination.size
+
     models.dmd_news.findAndCountAll({
-        limit: 10,
-        offset: 10 * page
+        limit: size,
+        offset: size * page
     }).then(news => {
         res.send(news)
     })

@@ -6,6 +6,7 @@ module.exports = function (server) {
     });
 
     require("./common")(server)
+    require("./members")(server)
     require("./news")(server)
     require("./messages")(server)
 }

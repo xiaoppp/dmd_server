@@ -25,6 +25,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     }
   }, {
-    tableName: 'dmd_admin_login_log'
+    tableName: 'dmd_admin_login_log',
+    timestamps: false
   });
 };

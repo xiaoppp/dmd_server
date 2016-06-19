@@ -37,6 +37,7 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: '0'
     }
   }, {
-    tableName: 'dmd_admin'
+    tableName: 'dmd_admin',
+    timestamps: false
   });
 };

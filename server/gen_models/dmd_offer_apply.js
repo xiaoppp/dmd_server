@@ -72,6 +72,7 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: '0'
     }
   }, {
-    tableName: 'dmd_offer_apply'
+    tableName: 'dmd_offer_apply',
+    timestamps: false
   });
 };

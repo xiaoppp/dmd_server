@@ -19,7 +19,7 @@ server.use(restify.bodyParser())
 require('./route/route')(server)
 
 // add all models
-const models = require('./mysql/index')
+require('./mysql/index')
 require('./mysql/model_extention')
 
 server.listen(3000, function() {

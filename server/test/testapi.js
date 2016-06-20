@@ -16,6 +16,6 @@
     },
     signup: {
         url: "http://localhost:3000/api/member/signup",
-        json: {"refer":"13994236373", "username":"12399999999", "pwd": "123", "pay_pwd": "123"}
+        json: {"refer":"13994236373", "mobile":"12399999999", "username":"12399999999", "pwd": "123", "pay_pwd": "123"}
     }
 }

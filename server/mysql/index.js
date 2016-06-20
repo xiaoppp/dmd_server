@@ -11,6 +11,7 @@ const sequelize = new Sequelize('duomiduo', 'root', '', {
     host: config.host,
     dialect: config.dialect,
     timestamps: false,
+    logging: true,
     pool: {
         max: 20,
         min: 0,

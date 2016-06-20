@@ -155,5 +155,12 @@ Object.assign(models.dmd_news, dmd_news)
 Object.assign(models.dmd_news_log, dmd_news_log)
 
 // add associations
-models.dmd_offer_help.hasMany(models.dmd_offer_apply)
-models.dmd_apply_help.hasMany(models.dmd_offer_apply)
+models.dmd_offer_help.hasMany(models.dmd_offer_apply, {as: 'pairs', foreignKey: 'oid'})
+models.dmd_apply_help.hasMany(models.dmd_offer_apply, {as: 'pairs', foreignKey: 'aid'})
+
+// models.dmd_offer_help.findById(147).then(offer => {
+//     console.log(offer.id)
+//     offer.getPairs().then(p => {
+//         console.log(p)
+//     })
+// })

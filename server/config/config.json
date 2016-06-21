@@ -3,7 +3,7 @@
         "username": "root",
         "password": null,
         "database": "duomiduo",
-        "host": "192.168.1.100",
+        "host": "192.168.1.102",
         "dialect": "mysql"
     },
     "test": {
@@ -18,6 +18,13 @@
         "password": null,
         "database": "duomiduo",
         "host": "192.168.1.107",
+        "dialect": "mysql"
+    },
+    "cronjob": {
+        "username": "root",
+        "password": null,
+        "database": "duomiduo",
+        "host": "192.168.1.102",
         "dialect": "mysql"
     },
     "pagination": {

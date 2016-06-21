@@ -19,8 +19,8 @@ server.use(restify.bodyParser())
 require('./route/route')(server)
 
 // add all models
-require('./mysql/index')
-require('./mysql/model_extention')
+const models = require('./mysql/index')
+require('./mysql/model_extention')(models)
 
 server.listen(3000, function() {
     console.log('%s listening at %s', server.name, server.url)

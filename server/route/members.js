@@ -5,17 +5,43 @@ const models = require('../mysql/index')
 const util = require('../util/util')
 
 module.exports = function(server) {
-    //server.get('/api/member/:memberid', findMemberById)
     server.get('/api/index/info/:memberid', fetchMemberInfo)
 
     server.get('/api/member/:username', findMemberByName)
     server.get('/api/member/check/:mobile', checkMobile)
+
+    server.get('/api/member/children/:parentid', findChildrenByParentId)
+
+    server.post('/api/member/reset', resetPassword)
 
     server.post('/api/member/signin', signin)
     server.post('/api/member/signout', signout)
     server.post('/api/member/signup', signup)
 
     server.post('/api/member/edit/info', updateMember)
+}
+
+const resetPassword = (req, res, next) => {
+    let username = req.params.username
+    let mobile = req.params.mobile
+    let pwd = req.params.pwd
+
+    co(function*() {
+        const member = models.dmd_members.findOne({
+            where: {
+                username: username
+            }
+        })
+
+        if (member.state === 0) {
+            throw new Exception("该会员被冻结")
+        }
+
+        member.pwd = util.getMd5(pwd)
+        yield member.save()
+    })
+    .then(m => util.success(res, m))
+    .catch(error => util.fail(res, error))
 }
 
 const fetchMemberInfo = (req, res, next) => {
@@ -25,35 +51,44 @@ const fetchMemberInfo = (req, res, next) => {
             let result = {
                 showNews: true
             }
-            result.member = yield models.dmd_members.findById(memberid)
+            result.member = yield models.dmd_members
+                .findById(memberid, {
+                    attributes: {
+                        include: [],
+                        exclude: ['team_ids']
+                    }
+                })
 
-            result.config6 = yield models.dmd_config.findById(6)
-            result.config24 = yield models.dmd_config.findById(24)
-
-            // console.log('====================>', result.config6)
-            // console.log('====================>', result.config24)
+            result.config6 = yield models.dmd_config.getConfig(6)
+            result.config24 = yield models.dmd_config.getConfig(24)
 
             const news = yield models.dmd_news.latestNews()
             const hasLatestNews = yield models.dmd_news_log.hasLatestNews(memberid, news.id)
+
             console.log('====================>', hasLatestNews)
             if (hasLatestNews)
                 result.showNews = false
 
             // 取最后的播种总单
             result.offer = yield models.dmd_offer_help.lastestOffer(memberid)
-            console.log('====================>offer', result.offer)
-
-            //result.offer.getdmd_offer_apply()
+            if (result.offer) {
+                const offerPairs = yield result.offer.getPairs()
+                result.offerPairs = offerPairs.length
+            }
 
             // 取最后的收获总单
             result.apply = yield models.dmd_apply_help.lastestApply(memberid)
-            console.log('====================>apply', result.apply)
+            if (result.apply) {
+                const applyPairs = yield result.apply.getPairs()
+                result.applyPairs = applyPairs.length
+            }
 
-            // 本金总额
-            result.incomeTotal = yield models.dmd_offer_help.memberTotalIncome(memberid)
+            // 冻结本金总额
+            result.moneyFreeze = yield models.dmd_offer_help.memberFreezeIncome(memberid)
             console.log('====================>', result.incomeTotal)
-                // 奖金总额
-            result.bonusTotal = yield models.dmd_income.memberTotalBonus(memberid)
+
+            // 冻结奖金总额
+            result.bonusFreeze = yield models.dmd_income.memberFreezeBonus(memberid)
             console.log('====================>', result.bonusTotal)
 
             return result
@@ -68,6 +103,23 @@ const findMemberByName = (req, res, next) => {
         .findOne({
             where: {
                 username: username
+            }
+        })
+        .then(m => util.success(res, m))
+        .catch(error => util.fail(res, error))
+}
+
+const findChildrenByParentId = (req, res, next) => {
+    const parentid = req.params.parentid
+
+    models.dmd_members
+        .findAll({
+            where: {
+                parent_id: parentid
+            },
+            attributes: {
+                include: [],
+                exclude: ['team_ids']
             }
         })
         .then(m => util.success(res, m))

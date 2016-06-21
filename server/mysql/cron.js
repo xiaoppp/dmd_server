@@ -3,20 +3,14 @@
 const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
-const env = process.env.NODE_ENV || "development";
-
-const config = require(path.join(__dirname, '..', 'config', 'config.json'))[env];
+const config = require(path.join(__dirname, '..', 'config', 'config.json'))['cronjob'];
 
 const sequelize = new Sequelize(config.database, config.username, config.password, {
     host: config.host,
     dialect: config.dialect,
     timestamps: false,
     logging: true,
-    pool: {
-        max: 100,
-        min: 0,
-        idle: 10000
-    }
+    pool: false
 })
 
 sequelize

@@ -21,11 +21,19 @@ module.exports = function(models) {
 
     const dmd_offer_apply = {
         //会员所有的播种或者收获金额
-        totalMoney(memberid) {
+        totalApplyMoney(applyid) {
             return models.dmd_offer_apply.sum(
                 'money', {
                     where: {
-                        aid: memberid
+                        aid: applyid
+                    }
+                })
+        },
+        totalOfferMoney(offerid) {
+            return models.dmd_offer_apply.sum(
+                'money', {
+                    where: {
+                        oid: offerid
                     }
                 })
         }
@@ -83,13 +91,11 @@ module.exports = function(models) {
     const dmd_offer_help = {
         // 所有正在准备播种的单子
         prepareMatchOffers(pendingDays) {
-            //$offers = $db->select("offer_help", "id,money,member_id", "member_id != ".$apply['member_id']." and state<100 and match_all=0 and the_time<".(time()-60*60*24*$conf5['val']), "id asc");
-
             return models.dmd_offer_help
                 .findAll({
                     where: {
-                        match_all: 0,
-                        the_time: {
+                        match_all: 0, //0表示未全部匹配完 1表示已全部匹配完
+                        the_time: { //播种天数大于7天
                             $lt: moment().unix() - 60*60*24*pendingDays
                         },
                         state: {

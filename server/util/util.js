@@ -19,7 +19,8 @@ const APIResult = () => {
     }
 }
 
-const fail = (res, errorMessage, code=0) => {
+const fail = (res, errorMessage, code) => {
+    code == undefined || 0
     const message = {
         isSuccess: false,
         error: {
@@ -27,10 +28,12 @@ const fail = (res, errorMessage, code=0) => {
             code: code
         }
     }
+    console.log(errorMessage)
     res.send(message)
 }
 
-const success = (res, data={}) => {
+const success = (res, data) => {
+    data == undefined || {}
     const message = {
         isSuccess: true,
         data: data

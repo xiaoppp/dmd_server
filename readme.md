@@ -47,5 +47,12 @@ https://rohan-paul.github.io/mongodb_in_ubuntu/2015/09/03/How_to_Install_MongoDB
 ## cronjob
 https://github.com/ncb000gt/node-cron
 
+
+## task queue
+http://www.jianshu.com/p/16e6c3803f56
+https://cnodejs.org/topic/5577b493c4e7fbea6e9a33c9
+https://www.npmjs.com/package/node-schedule
+http://blog.fens.me/nodejs-cron-later/
+
 ## sequelize auto
 sequelize-auto -o "./gen_models" -h 192.168.1.103 -d duomiduo -u root -p 3306 --dialect mysql

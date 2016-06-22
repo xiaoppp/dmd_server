@@ -49,7 +49,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       defaultValue: '1'
     },
-    match_all: {
+    match_all: { //0表示未全部匹配完 1表示已全部匹配完
       type: DataTypes.INTEGER(1),
       allowNull: true,
       defaultValue: '0'

@@ -7,6 +7,7 @@ const util = require('../util/util')
 module.exports = function(server) {
     server.get('/api/index/info/:memberid', fetchMemberInfo)
 
+    server.get('/api/member/info/:id', findMemberById)
     server.get('/api/member/:username', findMemberByName)
     server.get('/api/member/check/:mobile', checkMobile)
 
@@ -21,27 +22,38 @@ module.exports = function(server) {
     server.post('/api/member/edit/info', updateMember)
 }
 
+const findMemberById = (req, res, next) => {
+    const memberid = req.params.id
+    models.dmd_members.findById(memberid, {
+            attributes: {
+                include: ['mobile', 'truename']
+            }
+        })
+        .then(m => util.success(res, m))
+        .catch(error => util.fail(res, error))
+}
+
 const resetPassword = (req, res, next) => {
     let username = req.params.username
     let mobile = req.params.mobile
     let pwd = req.params.pwd
 
     co(function*() {
-        const member = models.dmd_members.findOne({
-            where: {
-                username: username
+            const member = models.dmd_members.findOne({
+                where: {
+                    username: username
+                }
+            })
+
+            if (member.state === 0) {
+                throw new Exception("该会员被冻结")
             }
+
+            member.pwd = util.getMd5(pwd)
+            yield member.save()
         })
-
-        if (member.state === 0) {
-            throw new Exception("该会员被冻结")
-        }
-
-        member.pwd = util.getMd5(pwd)
-        yield member.save()
-    })
-    .then(m => util.success(res, m))
-    .catch(error => util.fail(res, error))
+        .then(m => util.success(res, m))
+        .catch(error => util.fail(res, error))
 }
 
 const fetchMemberInfo = (req, res, next) => {
@@ -112,15 +124,26 @@ const findMemberByName = (req, res, next) => {
 const findChildrenByParentId = (req, res, next) => {
     const parentid = req.params.parentid
 
-    models.dmd_members
-        .findAll({
-            where: {
-                parent_id: parentid
-            },
-            attributes: {
-                include: [],
-                exclude: ['team_ids']
-            }
+    co(function*() {
+            const members = yield models.dmd_members
+                .findAll({
+                    where: {
+                        parent_id: parentid
+                    },
+                    attributes: {
+                        include: [],
+                        exclude: ['team_ids']
+                    }
+                })
+            members.map(m => {
+                let c = {
+                    id: m.id,
+                    name: m.truename,
+                    member: m
+                }
+                return c
+            })
+            return members
         })
         .then(m => util.success(res, m))
         .catch(error => util.fail(res, error))
@@ -157,7 +180,7 @@ const signup = (req, res, next) => {
             })
 
             if (!parent) {
-                return util.fail(res, "推荐人不正确")
+                yield Promise.reject('推荐人不正确')
             }
 
             let member = req.params
@@ -202,25 +225,85 @@ const signin = (req, res, next) => {
             if (member) {
                 member.last_login_time = moment().unix()
                 yield member.save()
-                util.success(res, {
+                return {
                     memberid: member.id,
                     token: null
-                })
+                }
             } else {
-                util.fail(res, '账号或密码错误')
+                yield Promise.reject('账号或密码错误');
             }
         })
-        .then(() => {})
-        .catch(error => util.fail(res, error))
+        .then(m => util.success(res, m))
+        .catch(error => {
+            console.log(error)
+            util.fail(res, error)
+        })
 }
 
 const signout = (req, res, next) => {}
 
 const updateMember = (req, res, next) => {
     let member = req.body
+    const id = req.body.id
+    console.log(id)
+    const pay_pwd = util.getMD5(req.body.pay_pwd)
+    const weixin = req.body.weixin
+    const alipay = req.body.alipay
+    const bank_num = req.body.bank_num
 
-    models.dmd_members
-        .save(member)
+    co(function*() {
+            const member = yield models.dmd_members.findById(req.body.id)
+
+            let findbankNum = yield models.dmd_members.findOne({
+                where: {
+                    bank_num: bank_num,
+                    id: {
+                        $ne: id
+                    }
+                }
+            })
+
+            if (findbankNum) {
+                yield Promise.reject('银行卡号重复')
+            }
+
+            let findWeiXin = yield models.dmd_members.findOne({
+                where: {
+                    weixin: weixin,
+                    id: {
+                        $ne: id
+                    }
+                }
+            })
+
+            if (findWeiXin) {
+                yield Promise.reject('微信账号重复')
+            }
+
+            let findalipay = yield models.dmd_members.findOne({
+                where: {
+                    alipay: alipay,
+                    id: {
+                        $ne: id
+                    }
+                }
+            })
+
+            if (findalipay) {
+                yield Promise.reject('支付宝账号重复')
+            }
+
+            if (member.pay_pwd !== pay_pwd) {
+                yield Promise.reject('安全密码错误')
+            }
+
+            if (member) {
+                yield member.updateAttributes(member)
+            }
+        })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => {
+            console.log(error)
+            util.fail(res, error)
+        })
 }

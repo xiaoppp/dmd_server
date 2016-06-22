@@ -3,7 +3,7 @@
         "username": "root",
         "password": null,
         "database": "duomiduo",
-        "host": "192.168.1.102",
+        "host": "192.168.1.8",
         "dialect": "mysql"
     },
     "test": {
@@ -24,7 +24,7 @@
         "username": "root",
         "password": null,
         "database": "duomiduo",
-        "host": "192.168.1.102",
+        "host": "192.168.1.8",
         "dialect": "mysql"
     },
     "pagination": {

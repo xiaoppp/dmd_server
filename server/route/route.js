@@ -9,4 +9,6 @@ module.exports = function (server) {
     require("./members")(server)
     require("./news")(server)
     require("./messages")(server)
+    require("./apply")(server)
+    require("./offer")(server)
 }

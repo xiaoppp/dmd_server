@@ -21,8 +21,8 @@ co(function*() {
 // 查找适合的播种单子
 function findOffer() {
     return co(function*() {
-        const config5 = yield models.dmd_config.getConfig(5) //匹配等待天数
-        const applys = yield models.dmd_apply_help.prepareMatchApplys(config5.val)
+        const conf5 = models.dmd_config.getConfig(5) //匹配等待天数
+        const applys = yield models.dmd_apply_help.prepareMatchApplys(conf5)
 
         for (let i = 0; i < applys.length; i++) {
             const applyMember = yield models.dmd_members.findById(apply.member_id)
@@ -41,7 +41,7 @@ function findOffer() {
                 }
                 if (applyGapMoney > 0) { //还没收获完,给这个人匹配
                     //查所有未完成播种
-                    const offers = yield models.dmd_offer_help.prepareMatchOffers(config5.val)
+                    const offers = yield models.dmd_offer_help.prepareMatchOffers(conf5)
 
                     for (let j = 0; j < offers.length; j++) {
                         let offer = offers[j]

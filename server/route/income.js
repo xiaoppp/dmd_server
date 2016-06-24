@@ -1,6 +1,7 @@
 "use strict"
 const co = require('co')
 const moment = require('moment')
+const restify = require('restify')
 const models = require('../mysql/index')
 const util = require('../util/util')
 const config = require('../config/config')
@@ -14,7 +15,7 @@ module.exports = function(server) {
 }
 
 const uploadReceipt = (req, res, next) => {
-    
+
 }
 
 const upload = (part, req, res, next) => {
@@ -29,7 +30,7 @@ const upload = (part, req, res, next) => {
 
 const findMoney = (req,res,next) => {
     const memberid = req.params.memberid
-    const page = req.params.page
+    const page = req.params.page - 1
     findIncome(memberid, page, "money")
     .then(m => {
         util.success(res, m)
@@ -39,7 +40,7 @@ const findMoney = (req,res,next) => {
 
 const findBonus = (req,res,next) => {
     const memberid = req.params.memberid
-    const page = req.params.page
+    const page = req.params.page - 1
     findIncome(memberid, page, "bonus")
     .then(m => {
         util.success(res, m)
@@ -49,7 +50,7 @@ const findBonus = (req,res,next) => {
 
 const findInterest = (req,res,next) => {
     const memberid = req.params.memberid
-    const page = req.params.page
+    const page = req.params.page - 1
     findIncome(memberid, page, "interest")
     .then(m => {
         util.success(res, m)
@@ -60,6 +61,7 @@ const findInterest = (req,res,next) => {
 const findIncome = (memberid, page, type) => {
     console.log('===============', page)
     const size = config.pagination.size
+
     return co(function*() {
         let result = {}
 
@@ -77,12 +79,21 @@ const findIncome = (memberid, page, type) => {
         })
 
         result.count = incomeCount + errorCount
-        const offset = size / 2 * page
-        console.log(offset)
-        const limit = size / 2
-        result.rows = yield models.sequelize.query(
-            "select * from dmd_income where member_id="+memberid+" and type='"+type+"' union all select * from dmd_income_error where member_id="+memberid+" and type='"+type+"' order by the_time desc limit "+offset+","+limit
-        )
+        const offset = size * page
+        const limit = size
+
+        console.log('===================')
+        console.log(offset, size)
+
+        const sql =
+         "select * from " +
+         "(select * from dmd_income " +
+         "union all " +
+         "select * from dmd_income_error)t " +
+         "where member_id="+memberid+" and type='"+type+"'" +
+         "order by the_time desc limit "+offset+","+limit
+
+        result.rows = yield models.sequelize.query(sql, { type: models.sequelize.QueryTypes.SELECT})
 
         result.money_ice = yield models.dmd_offer_help.sum('income', {
             where: {

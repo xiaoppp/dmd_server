@@ -1,6 +1,7 @@
 "use strict"
 const co = require('co')
 const moment = require('moment')
+const restify = require('restify')
 const models = require('../mysql/index')
 const util = require('../util/util')
 
@@ -9,10 +10,14 @@ module.exports = function(server) {
 
     server.get('/api/member/info/:id', findMemberById)
     server.get('/api/member/:username', findMemberByName)
+    //mobile是否重复
     server.get('/api/member/check/:mobile', checkMobile)
 
+    //是否是首单新用户
+    server.get('/api/member/check/new/:memberid', checkFirst)
+    //下级人数
     server.get('/api/member/children/amount/:memberid', findChildrenAmount)
-
+    //所有下级teamids
     server.get('/api/member/children/:parentid', findChildrenByParentId)
 
     server.post('/api/member/reset', restify.jsonBodyParser(), resetPassword)
@@ -20,10 +25,15 @@ module.exports = function(server) {
     server.post('/api/member/signin', restify.jsonBodyParser(), signin)
     server.post('/api/member/signout', restify.jsonBodyParser(), signout)
     server.post('/api/member/signup', restify.jsonBodyParser(), signup)
-
-    server.post('/api/member/edit/info', updateMember)
+    //修改会员资料
+    server.post('/api/member/edit/info', restify.jsonBodyParser(), updateMember)
 }
 
+const checkFirst = (req, res, next) => {
+    models.dmd_members.isNewMember(req.params.memberid)
+        .then(m => util.success(res, m))
+        .catch(error => util.fail(res, error))
+}
 
 const fetchMemberInfo = (req, res, next) => {
     const memberid = req.params.memberid
@@ -40,9 +50,10 @@ const fetchMemberInfo = (req, res, next) => {
                     }
                 })
 
-            result.config3 = yield models.dmd_config.getConfig(3)
-            result.config6 = yield models.dmd_config.getConfig(6)
-            result.config24 = yield models.dmd_config.getConfig(24)
+            result.config2 = models.dmd_config.getConfig(2) //'2', '1000-3000-5000-10000-30000-50000', '播种可选金额（单位：元）'
+            result.config3 = models.dmd_config.getConfig(3) //'3','500-100','收获最少金额 - 被整除数'
+            result.config6 = models.dmd_config.getConfig(6) //'6', '0.01', '播种日利息'
+            result.config24 = models.dmd_config.getConfig(24) //'24', '15', '投资周期（单位：天）'
 
             const news = yield models.dmd_news.latestNews()
             const hasLatestNews = yield models.dmd_news_log.hasLatestNews(memberid, news.id)
@@ -72,8 +83,7 @@ const fetchMemberInfo = (req, res, next) => {
             result.bonusFreeze = yield models.dmd_income.memberFreezeBonus(memberid)
             console.log('====================>', result.bonusTotal)
 
-            // TODO : 这里有错 需要查一下
-            //result.moneyApply = yield models.dmd_apply_help.applyTotalMoney(memberid)
+            result.moneyApply = yield models.dmd_apply_help.applyTotalMoney(memberid)
 
             return result
         })
@@ -260,16 +270,16 @@ const signin = (req, res, next) => {
 const signout = (req, res, next) => {}
 
 const updateMember = (req, res, next) => {
+
     let member = req.body
-    const id = req.body.id
-    console.log(id)
+    const id = req.params.id
     const pay_pwd = util.getMD5(req.body.pay_pwd)
     const weixin = req.body.weixin
     const alipay = req.body.alipay
     const bank_num = req.body.bank_num
 
     co(function*() {
-            const member = yield models.dmd_members.findById(req.body.id)
+            const findmember = yield models.dmd_members.findById(id)
 
             let findbankNum = yield models.dmd_members.findOne({
                 where: {
@@ -310,12 +320,14 @@ const updateMember = (req, res, next) => {
                 yield Promise.reject('支付宝账号重复')
             }
 
-            if (member.pay_pwd !== pay_pwd) {
+            if (findmember.pay_pwd !== pay_pwd) {
                 yield Promise.reject('安全密码错误')
             }
 
-            if (member) {
-                yield member.updateAttributes(member)
+            console.log('===================')
+
+            if (findmember) {
+                return yield findmember.updateAttributes(member)
             }
         })
         .then(m => util.success(res, m))

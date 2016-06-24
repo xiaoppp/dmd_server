@@ -1,7 +1,7 @@
 "use strict"
 const co = require('co')
 const moment = require('moment')
-const config = require('../util/configCache')
+const configCache = require('../util/configCache')
 
 module.exports = function(models) {
 
@@ -13,17 +13,16 @@ module.exports = function(models) {
 
     const dmd_config = {
         getConfig(id) {
-            console.log(id)
-            //return configCache[id].val
-            return models.dmd_config.findById(id)
-        },
-        setConfig(id, val) {
-            return co(function*() {
-                let config = yield models.dmd_config.findById(id)
-                config.val = val
-                config.save()
-            })
+            id = id - 1
+            return configCache.getConfig(id)
         }
+        // setConfig(id, val) {
+        //     return co(function*() {
+        //         let config = yield models.dmd_config.findById(id)
+        //         config.val = val
+        //         config.save()
+        //     })
+        // }
     }
 
     const dmd_news = {

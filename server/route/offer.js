@@ -3,12 +3,81 @@ const co = require('co')
 const moment = require('moment')
 const models = require('../mysql/index')
 const util = require('../util/util')
+const restify = require('restify')
 
 module.exports = function(server) {
+    server.post('/api/offers/detail', restify.jsonBodyParser(), findOfferDetail)
+
+    server.get('/api/offers/:memberid', findMemberOffers)
+
     server.post('/api/offer/member', restify.jsonBodyParser(), offer)
     server.post('/api/offer/member/check', restify.jsonBodyParser(), checkOffer)
 }
 
+const findMemberOffers = (req, res, next) => {
+    const memberid = req.params.memberid
+    co(function*() {
+        const member = yield models.dmd_members.findById(memberid)
+        const orderby = member.type == 1 ? ['state', 'asc'] : ['the_time', 'desc']
+        const result = {}
+        const offers = yield models.dmd_offer_help.findAll({
+            where: {
+                member_id: memberid
+            },
+            order: [
+                orderby
+            ]
+        })
+
+        return yield offers.map(function*(o) {
+            const count = yield models.dmd_offer_apply.count({
+                where: {
+                    oid: o.id
+                }
+            })
+            return {
+                offer: o,
+                pct: count
+            }
+        })
+    })
+    .then(m => util.success(res, m))
+    .catch(error => util.fail(res, error))
+}
+
+const findOfferDetail = (req, res, next) => {
+    const offerid = req.params.offerid
+    const memberid = req.params.memberid
+    const applyMemberid = req.params.amid
+
+    co(function*() {
+        let result = {}
+        result.offer = yield models.dmd_offer_help.findById(offerid)
+        result.pairs = yield models.dmd_offer_apply.findAll({
+            where: {
+                om_id: memberid,
+                oid: offerid
+            }
+        })
+
+        for (let i =0; i< pairs.length; i++) {
+            const applyMember = yield models.dmd_members.findById(applyMemberid)
+            result.applyMember = applyMember
+            if (applyMember.parent_id > 0) {
+                result.applyMemberParent = yield models.dmd_members.findById(applyMember.parent_id)
+            }
+        }
+
+        result.conf6 = models.dmd_config.getConfig(6)
+        result.conf12 = models.dmd_config.getConfig(12)
+        result.conf24 = models.dmd_config.getConfig(24)
+        return result
+    })
+    .then(m => util.success(res, m))
+    .catch(error => util.fail(res, error))
+}
+
+//查看是否可以播种
 const checkOffer = (req, res, next) => {
     const money = Number(req.params.money)
     const memberid = req.params.memberid
@@ -22,13 +91,13 @@ const checkOffer = (req, res, next) => {
 }
 
 const offer = (req, res, next) => {
-    const money = req.params.money
+    const money = Number(req.params.money)
     const memberid = req.params.memberid
 
     co(function*(){
         const member = yield models.dmd_members.findById(memberid)
         // 查最后一单
-        const lastoffer = yield dmd_offer_help.findOne({
+        const lastoffer = yield models.dmd_offer_help.findOne({
             where: {
                 member_id: memberid
             },
@@ -36,15 +105,19 @@ const offer = (req, res, next) => {
                 ['the_time', 'DESC']
             ]
         })
-        yield models.dmd_apply_help.checkOffer(money, member, lastoffer)
-        yield addOffer(money, member)
+        yield models.dmd_offer_help.checkOffer(money, member, lastoffer)
+        const offer = yield addOffer(money, member)
 
-        if (offer.state < 100 && member.the_time < member.reg_time) { //首单
+        if (lastoffer.state < 100 && member.the_time < member.reg_time) { //首单
             yield addFirstOffer(money, member, lastoffer)
         }
+        return offer
     })
     .then(m => util.success(res, m))
-    .catch(error => util.fail(res, error))
+    .catch(error => {
+        console.log(error)
+        util.fail(res, error)
+    })
 }
 
 function addFirstOffer(money, member, offer) {

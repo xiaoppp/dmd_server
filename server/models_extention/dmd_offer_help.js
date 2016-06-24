@@ -52,16 +52,16 @@ const dmd_offer_help = {
             if (!member.weixin || !member.alipay || !member.bank || !member.bank_num) {
                 yield Promise.reject("请先完善资料")
             }
-            const conf2 = yield models.dmd_config.getConfig(2) //array(1000,3000,5000,10000,20000,50000);
-            const conf2list = conf2.val.split(',')
+            const conf2 = models.dmd_config.getConfig(2) //array(1000,3000,5000,10000,20000,50000);
+            const conf2list = conf2.split(',')
 
-            const conf22 = yield models.dmd_config.findById(22)
-            const conf22list = conf22.val.split('-')
+            const conf22 = models.dmd_config.getConfig(22)
+            const conf22list = conf22.split('-')
             if (conf22list[0] !== "1") {
                 yield Promise.reject("系统临时限制播种")
             }
 
-            const conf7 = yield models.dmd_config.findById(7) //播种每天最高限额（单位：元）
+            const conf7 = models.dmd_config.findById(7) //播种每天最高限额（单位：元）
 
             const alreadyOfferMoney = yield models.dmd_apply_help.sum('money', {
                 where: {
@@ -74,17 +74,17 @@ const dmd_offer_help = {
                 }
             })
             console.log("alreadyOfferMoney", alreadyOfferMoney)
-            if (alreadyOfferMoney + money > Number(conf7.val)) {
+            if (alreadyOfferMoney + money > Number(conf7)) {
                 yield Promise.reject("不能超过平台每日最高限额")
             }
 
-            if (!offer || offer.state < 100) {
+            if (offer && offer.state < 100) {
                 yield Promise.reject("上一次的播种还未完成")
             }
 
             if (!offer || offer.the_time < member.reg_time) { //新注册用户
-                const conf26 = yield dmd_config.getConfig(26) //买激活币开关
-                if (conf26.val != 1) {
+                const conf26 = models.dmd_config.getConfig(26) //买激活币开关
+                if (conf26 != 1) {
                     yield Promise.reject("临时限制购买激活币")
                 }
                 if(money !== Number(conf2list[0])) {

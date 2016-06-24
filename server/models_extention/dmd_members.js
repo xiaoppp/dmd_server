@@ -4,6 +4,26 @@ const co = require('co')
 const moment = require('moment')
 
 const dmd_members = {
+    //是否首次注册会员
+    isNewMember(memberid) {
+        return co(function*() {
+            const member = yield models.dmd_members.findById(memberid)
+            const offer = yield models.dmd_offer_help.findOne({
+                where: {
+                    member_id: memberid
+                },
+                order: [
+                    ['the_time', 'DESC']
+                ]
+            })
+
+            if (!offer || offer.the_time < member.reg_time) {
+                return true
+            }
+            else
+                return false
+        })
+    },
     updateAllParents(parents, memberid) {
         return co(function*() {
             // console.log('==================', memberid)

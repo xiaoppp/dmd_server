@@ -3,6 +3,7 @@ const co = require('co')
 const models = require('../mysql/index')
 const config = require('../config/config.json')
 const util = require('../util/util')
+const restify = require('restify')
 
 module.exports = function(server) {
     server.get('/api/news/page/:page', findNewsList)

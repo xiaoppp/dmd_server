@@ -42,6 +42,9 @@ require('./models_extention/model')(models)
 
 require('./util/configCache')
 
+// const util = require('./util/util')
+// console.log(util.getMD5('1234'))
+
 server.listen(3000, function() {
     console.log('%s listening at %s', server.name, server.url)
 })

@@ -11,15 +11,85 @@ module.exports = function(server) {
     server.get('/api/member/:username', findMemberByName)
     server.get('/api/member/check/:mobile', checkMobile)
 
+    server.get('/api/member/children/amount/:memberid', findChildrenAmount)
+
     server.get('/api/member/children/:parentid', findChildrenByParentId)
 
-    server.post('/api/member/reset', resetPassword)
+    server.post('/api/member/reset', restify.jsonBodyParser(), resetPassword)
 
-    server.post('/api/member/signin', signin)
-    server.post('/api/member/signout', signout)
-    server.post('/api/member/signup', signup)
+    server.post('/api/member/signin', restify.jsonBodyParser(), signin)
+    server.post('/api/member/signout', restify.jsonBodyParser(), signout)
+    server.post('/api/member/signup', restify.jsonBodyParser(), signup)
 
     server.post('/api/member/edit/info', updateMember)
+}
+
+
+const fetchMemberInfo = (req, res, next) => {
+    const memberid = req.params.memberid
+
+    co(function*() {
+            let result = {
+                showNews: true
+            }
+            result.member = yield models.dmd_members
+                .findById(memberid, {
+                    attributes: {
+                        include: [],
+                        exclude: ['team_ids']
+                    }
+                })
+
+            result.config3 = yield models.dmd_config.getConfig(3)
+            result.config6 = yield models.dmd_config.getConfig(6)
+            result.config24 = yield models.dmd_config.getConfig(24)
+
+            const news = yield models.dmd_news.latestNews()
+            const hasLatestNews = yield models.dmd_news_log.hasLatestNews(memberid, news.id)
+
+            if (!hasLatestNews)
+                result.showNews = false
+
+            // 取最后的播种总单
+            result.offer = yield models.dmd_offer_help.lastestOffer(memberid)
+            if (result.offer) {
+                const offerPairs = yield result.offer.getPairs()
+                result.offerPairs = offerPairs.length
+            }
+
+            // 取最后的收获总单
+            result.apply = yield models.dmd_apply_help.lastestApply(memberid)
+            if (result.apply) {
+                const applyPairs = yield result.apply.getPairs()
+                result.applyPairs = applyPairs.length
+            }
+
+            // 冻结本金总额
+            result.moneyFreeze = yield models.dmd_offer_help.memberFreezeIncome(memberid)
+            console.log('====================>', result.incomeTotal)
+
+            // 冻结奖金总额
+            result.bonusFreeze = yield models.dmd_income.memberFreezeBonus(memberid)
+            console.log('====================>', result.bonusTotal)
+
+            // TODO : 这里有错 需要查一下
+            //result.moneyApply = yield models.dmd_apply_help.applyTotalMoney(memberid)
+
+            return result
+        })
+        .then(m => util.success(res, m))
+        .catch(error => util.fail(res, error))
+}
+
+const findChildrenAmount = (req, res, next) => {
+    const memberid = req.params.memberid
+    models.dmd_members.findById(memberid)
+    .then(m => {
+        const ids = m.team_ids
+        const idslist = ids.split(',')
+        util.success(res, idslist.length)}
+    )
+    .catch(error => util.fail(res, error))
 }
 
 const findMemberById = (req, res, next) => {
@@ -51,59 +121,6 @@ const resetPassword = (req, res, next) => {
 
             member.pwd = util.getMd5(pwd)
             yield member.save()
-        })
-        .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
-}
-
-const fetchMemberInfo = (req, res, next) => {
-    const memberid = req.params.memberid
-
-    co(function*() {
-            let result = {
-                showNews: true
-            }
-            result.member = yield models.dmd_members
-                .findById(memberid, {
-                    attributes: {
-                        include: [],
-                        exclude: ['team_ids']
-                    }
-                })
-
-            result.config6 = yield models.dmd_config.getConfig(6)
-            result.config24 = yield models.dmd_config.getConfig(24)
-
-            const news = yield models.dmd_news.latestNews()
-            const hasLatestNews = yield models.dmd_news_log.hasLatestNews(memberid, news.id)
-
-            console.log('====================>', hasLatestNews)
-            if (hasLatestNews)
-                result.showNews = false
-
-            // 取最后的播种总单
-            result.offer = yield models.dmd_offer_help.lastestOffer(memberid)
-            if (result.offer) {
-                const offerPairs = yield result.offer.getPairs()
-                result.offerPairs = offerPairs.length
-            }
-
-            // 取最后的收获总单
-            result.apply = yield models.dmd_apply_help.lastestApply(memberid)
-            if (result.apply) {
-                const applyPairs = yield result.apply.getPairs()
-                result.applyPairs = applyPairs.length
-            }
-
-            // 冻结本金总额
-            result.moneyFreeze = yield models.dmd_offer_help.memberFreezeIncome(memberid)
-            console.log('====================>', result.incomeTotal)
-
-            // 冻结奖金总额
-            result.bonusFreeze = yield models.dmd_income.memberFreezeBonus(memberid)
-            console.log('====================>', result.bonusTotal)
-
-            return result
         })
         .then(m => util.success(res, m))
         .catch(error => util.fail(res, error))

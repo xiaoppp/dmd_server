@@ -9,7 +9,7 @@ module.exports = function(server) {
     server.get('/api/messages/reply/:memberid', replyMessages)
 
     server.get('/api/message/:id', findMessagesById)
-    server.post('/api/message/action/leavemsg', saveMessage)
+    server.post('/api/message/action/leavemsg', restify.jsonBodyParser(), saveMessage)
 }
 
 const findMessagesList = (req, res, next) => {

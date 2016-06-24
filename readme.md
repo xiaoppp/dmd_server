@@ -51,7 +51,7 @@ https://github.com/ncb000gt/node-cron
 ## task queue
 http://www.jianshu.com/p/16e6c3803f56
 https://cnodejs.org/topic/5577b493c4e7fbea6e9a33c9
-https://www.npmjs.com/package/node-schedule
+https://github.com/node-schedule/node-schedule
 http://blog.fens.me/nodejs-cron-later/
 
 ## sequelize auto

@@ -9,14 +9,8 @@ const getMD5 = (mobile) => {
     return e
 }
 
-const APIResult = () => {
-    return {
-        isSuccess: false,
-        error: {
-            message: "",
-            code: 0
-        }
-    }
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 const fail = (res, errorMessage, code) => {
@@ -45,7 +39,7 @@ const util = {
     getMD5: getMD5,
     success: success,
     fail: fail,
-    APIResult: APIResult
+    getRandomInt: getRandomInt
 }
 
 module.exports = util

@@ -10,5 +10,7 @@ module.exports = function (server) {
     require("./news")(server)
     require("./messages")(server)
     require("./apply")(server)
+    require("./income")(server)
     require("./offer")(server)
+    require("./pair")(server)
 }

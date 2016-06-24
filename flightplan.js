@@ -3,7 +3,7 @@ var plan = require('flightplan');
 
 // configuration
 plan.target('develop', {
-    host: '192.168.1.8',
+    host: '192.168.1.107',
     username: 'ubuntu',
     agent: process.env.SSH_AUTH_SOCK,
     failsafe: true

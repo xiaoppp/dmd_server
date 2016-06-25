@@ -47,8 +47,13 @@ const fetchMemberInfo = (req, res, next) => {
                     attributes: {
                         include: [],
                         exclude: ['team_ids']
-                    }
+                    },
+                    include: [
+                        { model: models.dmd_apply_help, as: 'applys' },
+                        { model: models.dmd_offer_help, as: 'offers' }
+                    ]
                 })
+            
 
             result.config2 = models.dmd_config.getConfig(2) //'2', '1000-3000-5000-10000-30000-50000', '播种可选金额（单位：元）'
             result.config3 = models.dmd_config.getConfig(3) //'3','500-100','收获最少金额 - 被整除数'

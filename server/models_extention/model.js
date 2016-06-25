@@ -61,8 +61,11 @@ module.exports = function(models) {
     Object.assign(models.dmd_news_log, dmd_news_log)
 
     // add associations
-    models.dmd_offer_help.hasMany(models.dmd_offer_apply, {as: 'pairs', foreignKey: 'oid'})
-    models.dmd_apply_help.hasMany(models.dmd_offer_apply, {as: 'pairs', foreignKey: 'aid'})
+    models.dmd_members.hasMany(models.dmd_offer_help, {as: 'offers', foreignKey: 'member_id', constraints: false})
+    models.dmd_members.hasMany(models.dmd_apply_help, {as: 'applys', foreignKey: 'member_id', constraints: false})
+
+    models.dmd_offer_help.hasMany(models.dmd_offer_apply, {as: 'pairs', foreignKey: 'oid', constraints: false})
+    models.dmd_apply_help.hasMany(models.dmd_offer_apply, {as: 'pairs', foreignKey: 'aid', constraints: false})
 
     // models.dmd_offer_help.findById(147).then(offer => {
     //     console.log(offer.id)

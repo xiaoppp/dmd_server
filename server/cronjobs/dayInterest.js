@@ -12,7 +12,7 @@ module.exports = () => {
             yield calculateIntrest(members[i])
         }
     })
-    .then()
+    .then(d => console.log(d))
     .catch(error => console.log(error))
 }
 
@@ -41,7 +41,7 @@ function calculateIntrest(member) {
                 where: {
                     member_id: member.id,
                     state: 100,
-                    fst: 0
+                    fst: 0,
                     income: {
                         $gt: 0
                     }
@@ -52,7 +52,7 @@ function calculateIntrest(member) {
                 where: {
                     member_id: memberid,
                     state: 100,
-                    fst: 1
+                    fst: 1,
                     income: {
                         $gt: 0
                     }
@@ -84,7 +84,7 @@ function calculateIntrest(member) {
 }
 
 function findAllMembers() {
-    return yield models.dmd_members.findAll({
+    return models.dmd_members.findAll({
         where: {
             type: 0,
             ok: 1,

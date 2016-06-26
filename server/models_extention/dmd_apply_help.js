@@ -4,6 +4,9 @@ const co = require('co')
 const moment = require('moment')
 
 const dmd_apply_help = {
+    test() {
+        console.log('test')
+    },
     //所有正在准备收获的单子
     prepareMatchApplys() {
         return models.dmd_apply_help

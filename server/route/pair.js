@@ -7,6 +7,7 @@ const config = require('../config/config')
 const restify = require('restify')
 
 module.exports = function(server) {
+    // 失败匹配
     server.get('/api/pairs/failed/:memberid', findMemberFailedPairs)
 
     // 仲裁结果 申请投诉 撤销

@@ -2,7 +2,7 @@
 
 const co = require('co')
 const moment = require('moment')
-const models = require('../mysql/cron')
+const models = require('../mysql/index')
 
 module.exports = () => {
     co(function*() {
@@ -10,11 +10,9 @@ module.exports = () => {
 
         yield updateOffer(pair)
 
-        const time = yield models.dmd_last_time.findById(37)
-        time.val = moment().unix()
-        yield time.save()
+        yield models.dmd_last_time.update(37)
     })
-    .then()
+    .then(d => console.log(d))
     .catch(error => console.log(error))
 }
 
@@ -22,11 +20,13 @@ module.exports = () => {
 function findOffer() {
     return co(function*() {
         const conf5 = models.dmd_config.getConfig(5) //匹配等待天数
-        const applys = yield models.dmd_apply_help.prepareMatchApplys(conf5)
+
+        const applys = yield models.dmd_apply_help.prepareMatchApplys()
 
         for (let i = 0; i < applys.length; i++) {
-            const applyMember = yield models.dmd_members.findById(apply.member_id)
             let apply = applys[i]
+
+            const applyMember = yield models.dmd_members.findById(apply.member_id)
 
             if (applyMember.state === 1) {
                 // 当前会员的已经匹配金额
@@ -59,7 +59,7 @@ function findOffer() {
                                 return {
                                     offer: offer,
                                     apply: apply,
-                                    offerGapMoney: offer.money - totalOfferMoney
+                                    offerGapMoney: offer.money - totalOfferMoney,
                                     applyGapMoney: applyGapMoney
                                 }
                             }
@@ -73,7 +73,7 @@ function findOffer() {
                 }
             }
         }
-    }
+    })
 }
 
 // 增加匹配 更新总单和匹配状态
@@ -85,7 +85,7 @@ function updateOffer(pair) {
     const money = applyGapMoney > offerGapMoney ? offerGapMoney : applyGapMoney
 
     return co(function*() {
-        const time = moment().unix(),
+        const time = moment().unix()
         const offerapply = yield models.dmd_offer_apply.create({
             the_time: time,
             code: "OA" + offer.member_id + apply.member_id + time,

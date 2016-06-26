@@ -11,6 +11,16 @@ module.exports = function(models) {
     require('./dmd_offer_apply')
     require('./dmd_income')
 
+    const dmd_last_time = {
+        update(id) {
+            return co(function*() {
+                const time = yield models.dmd_last_time.findById(id)
+                time.val = moment().unix()
+                yield time.save()
+            })
+        }
+    }
+
     const dmd_config = {
         getConfigAll() {
             return configCache.cache()
@@ -62,6 +72,7 @@ module.exports = function(models) {
     Object.assign(models.dmd_config, dmd_config)
     Object.assign(models.dmd_news, dmd_news)
     Object.assign(models.dmd_news_log, dmd_news_log)
+    Object.assign(models.dmd_last_time, dmd_last_time)
 
     // add associations
     models.dmd_members.hasMany(models.dmd_offer_help, {as: 'offers', foreignKey: 'member_id', constraints: false})

@@ -5,6 +5,9 @@ const moment = require('moment')
 const util = require('../util/util')
 
 const dmd_offer_apply = {
+
+    //确认收款
+
     //会员当前已收获的金额
     totalApplyMoney(applyid) {
         return models.dmd_offer_apply.sum(

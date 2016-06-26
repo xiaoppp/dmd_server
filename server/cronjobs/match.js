@@ -2,21 +2,21 @@
 
 const co = require('co')
 const moment = require('moment')
-const _ = require('underscore')
 const models = require('../mysql/cron')
-require('../mysql/model_extention')(models)
 
-co(function*() {
-    const pair = yield findOffer()
+module.exports = () => {
+    co(function*() {
+        const pair = yield findOffer()
 
-    yield updateOffer(pair)
+        yield updateOffer(pair)
 
-    const time = yield models.dmd_last_time.findById(37)
-    time.val = moment().unix()
-    yield time.save()
-})
-.then()
-.catch(error => console.log(error))
+        const time = yield models.dmd_last_time.findById(37)
+        time.val = moment().unix()
+        yield time.save()
+    })
+    .then()
+    .catch(error => console.log(error))
+}
 
 // 查找适合的播种单子
 function findOffer() {

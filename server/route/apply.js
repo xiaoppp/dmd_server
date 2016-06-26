@@ -8,14 +8,41 @@ const util = require('../util/util')
 module.exports = function(server) {
     server.get('/api/applys/:memberid', findMemberApplys)
 
-    server.post('/api/applys/detail', restify.jsonBodyParser(), findApplyDetail)
+    server.post('/api/apply/detail', restify.jsonBodyParser(), findApplyDetail)
 
     server.post('/api/apply/member', restify.jsonBodyParser(), apply)
     server.post('/api/apply/member/check', restify.jsonBodyParser(), checkApply)
 }
 
 const findApplyDetail = (req, res, next) => {
+    const applyid = req.params.applyid
+    const memberid = req.params.memberid
+    //const offerMemberid = req.params.omid
 
+    co(function*() {
+        let result = {}
+        result.apply = yield models.dmd_apply_help.findById(applyid)
+        result.pairs = yield models.dmd_offer_apply.findAll({
+            where: {
+                am_id: memberid,
+                aid: applyid
+            }
+        })
+
+        for (let i = 0; i < result.pairs.length; i++) {
+            let item = result.pairs[i]
+            let offerMember = yield models.dmd_members.findOne({where:{id:item.om_id},attributes:{exclude:['team_ids']}})
+            //result.offerMember = offerMember
+            item.setDataValue('offerMember',offerMember)
+            if (offerMember.parent_id > 0) {
+                let offerMemberParent = yield models.dmd_members.findOne({where:{id:offerMember.parent_id},attributes:{exclude:['team_ids']}})
+                item.setDataValue('offerMemberParent',offerMemberParent)
+            }
+        }
+        return result
+    })
+    .then(m => util.success(res, m))
+    .catch(error => util.fail(res, error))
 }
 
 const findMemberApplys = (req, res, next) => {

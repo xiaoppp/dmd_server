@@ -6,8 +6,6 @@ const models = require('../mysql/index')
 const util = require('../util/util')
 
 module.exports = function(server) {
-    server.get('/api/index/info/:memberid', fetchMemberInfo)
-
     server.get('/api/member/info/:id', findMemberById)
     server.get('/api/member/:username', findMemberByName)
     //mobile是否重复
@@ -35,76 +33,13 @@ const checkFirst = (req, res, next) => {
         .catch(error => util.fail(res, error))
 }
 
-const fetchMemberInfo = (req, res, next) => {
-    const memberid = req.params.memberid
-
-    co(function*() {
-            let result = {
-                showNews: true
-            }
-            result.member = yield models.dmd_members
-                .findById(memberid, {
-                    attributes: {
-                        include: [],
-                        exclude: ['team_ids']
-                    },
-                    include: [
-                        { model: models.dmd_apply_help, as: 'applys' },
-                        { model: models.dmd_offer_help, as: 'offers' }
-                    ]
-                })
-            
-
-            result.config2 = models.dmd_config.getConfig(2) //'2', '1000-3000-5000-10000-30000-50000', '播种可选金额（单位：元）'
-            result.config3 = models.dmd_config.getConfig(3) //'3','500-100','收获最少金额 - 被整除数'
-            result.config6 = models.dmd_config.getConfig(6) //'6', '0.01', '播种日利息'
-            result.config24 = models.dmd_config.getConfig(24) //'24', '15', '投资周期（单位：天）'
-
-            const news = yield models.dmd_news.latestNews()
-            const hasLatestNews = yield models.dmd_news_log.hasLatestNews(memberid, news.id)
-
-            if (!hasLatestNews)
-                result.showNews = false
-
-            // 取最后的播种总单
-            result.offer = yield models.dmd_offer_help.lastestOffer(memberid)
-            if (result.offer) {
-                const offerPairs = yield result.offer.getPairs()
-                result.offerPairs = offerPairs.length
-            }
-
-            // 取最后的收获总单
-            result.apply = yield models.dmd_apply_help.lastestApply(memberid)
-            if (result.apply) {
-                const applyPairs = yield result.apply.getPairs()
-                result.applyPairs = applyPairs.length
-            }
-
-            // 冻结本金总额
-            result.moneyFreeze = yield models.dmd_offer_help.memberFreezeIncome(memberid)
-            console.log('====================>', result.incomeTotal)
-
-            // 冻结奖金总额
-            result.bonusFreeze = yield models.dmd_income.memberFreezeBonus(memberid)
-            console.log('====================>', result.bonusTotal)
-
-            result.moneyApply = yield models.dmd_apply_help.applyTotalMoney(memberid)
-
-            return result
-        })
-        .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
-}
-
 const findChildrenAmount = (req, res, next) => {
     const memberid = req.params.memberid
-    models.dmd_members.findById(memberid)
-    .then(m => {
-        const ids = m.team_ids
-        const idslist = ids.split(',')
-        util.success(res, idslist.length)}
-    )
-    .catch(error => util.fail(res, error))
+    models.dmd_members.findChildrenAmount(memberid)
+        .then(m => {
+            util.success(res, m)}
+        )
+        .catch(error => util.fail(res, error))
 }
 
 const findMemberById = (req, res, next) => {

@@ -8,6 +8,11 @@ const restify = require('restify')
 
 module.exports = function(server) {
     server.get('/api/pairs/failed/:memberid', findMemberFailedPairs)
+
+    // 仲裁结果 申请投诉 撤销
+    server.post('/api/pairs/judge', judge)
+
+    server.post('/api/pairs/remark', remark)
 }
 
 const findMemberFailedPairs = (req, res, next) => {
@@ -44,5 +49,52 @@ const findMemberFailedPairs = (req, res, next) => {
     })
     .then(m => util.success(res, m))
     .catch(error => util.fail(res, error))
+}
 
+const judge = (req, res, next) => {
+    const oaid = req.params.oaid
+    const memberid = req.params.memberid
+    const judge = req.params.judge
+
+    co(function*() {
+        const offerapply = yield models.dmd_offer_apply.findById(oaid)
+        offerapply.judge = judge
+        yield offerapply.save()
+    })
+    .then(m => util.success(res, m))
+    .catch(error => util.fail(res, error))
+}
+
+const remark = (req, res, next) => {
+    const oaid = req.params.oaid
+    const remark = req.params.remark
+    const omid = req.params.omid
+
+    co(function*() {
+        const offerapply = yield models.dmd_offer_apply.findById(oaid)
+        offerapply.remark = remark
+        offerapply.save()
+
+        const count = yield models.dmd_offer_apply.count({
+            where: {
+                om_id: omid,
+                remark: {
+                    $gt : 0
+                }
+            }
+        })
+        const sum = yield models.dmd_offer_apply.sum('remark', {
+            where: {
+                om_id: omid,
+                remark: {
+                    $gt : 0
+                }
+            }
+        })
+        const member = yield models.dmd_members.findById(omid)
+        member.believe = math.round(sum/count)
+        yield member.save()
+    })
+    .then(m => util.success(res, m))
+    .catch(error => util.fail(res, error))
 }

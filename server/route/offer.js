@@ -6,7 +6,7 @@ const util = require('../util/util')
 const restify = require('restify')
 
 module.exports = function(server) {
-    server.post('/api/offers/detail', restify.jsonBodyParser(), findOfferDetail)
+    server.post('/api/offer/detail', restify.jsonBodyParser(), findOfferDetail)
 
     server.get('/api/offers/:memberid', findMemberOffers)
 
@@ -48,7 +48,7 @@ const findMemberOffers = (req, res, next) => {
 const findOfferDetail = (req, res, next) => {
     const offerid = req.params.offerid
     const memberid = req.params.memberid
-    const applyMemberid = req.params.amid
+    //const applyMemberid = req.params.amid
 
     co(function*() {
         let result = {}
@@ -60,17 +60,16 @@ const findOfferDetail = (req, res, next) => {
             }
         })
 
-        for (let i =0; i< pairs.length; i++) {
-            const applyMember = yield models.dmd_members.findById(applyMemberid)
-            result.applyMember = applyMember
+        for (let i = 0; i < result.pairs.length; i++) {
+            let item = result.pairs[i]
+            //const applyMember = yield models.dmd_members.findById(applyMemberid)
+            const applyMember = yield models.dmd_members.findOne({where:{id:item.am_id},attributes:{exclude:['team_ids']}})
+            item.setDataValue('applyMember',applyMember)
             if (applyMember.parent_id > 0) {
-                result.applyMemberParent = yield models.dmd_members.findById(applyMember.parent_id)
+                let applyMemberParent = yield models.dmd_members.findOne({where:{id:applyMember.parent_id},attributes:{exclude:['team_ids']}})
+                item.setDataValue('applyMemberParent',applyMemberParent)
             }
         }
-
-        result.conf6 = models.dmd_config.getConfig(6)
-        result.conf12 = models.dmd_config.getConfig(12)
-        result.conf24 = models.dmd_config.getConfig(24)
         return result
     })
     .then(m => util.success(res, m))

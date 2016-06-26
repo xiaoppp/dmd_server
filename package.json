@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "co": "^4.6.0",
+    "cron": "^1.1.0",
     "crypto": "0.0.3",
     "moment": "^2.13.0",
     "mongoose": "^4.4.19",

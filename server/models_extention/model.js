@@ -12,6 +12,9 @@ module.exports = function(models) {
     require('./dmd_income')
 
     const dmd_config = {
+        getConfigAll() {
+            return configCache.cache()
+        },
         getConfig(id) {
             id = id - 1
             return configCache.getConfig(id)

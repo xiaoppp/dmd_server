@@ -17,6 +17,12 @@ function findConfig() {
 }
 
 let configCache = {
+    cache() {
+        if (cache)
+            return cache
+        else
+            return null
+    },
     getConfig(id) {
         if (cache[id])
             return cache[id].val

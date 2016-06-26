@@ -4,6 +4,17 @@ const co = require('co')
 const moment = require('moment')
 
 const dmd_members = {
+    findChildrenAmount(memberid) {
+        return co(function*() {
+            console.log(123, '=================')
+            const member = yield models.dmd_members.findById(memberid)
+            if (member.team_ids) {
+                const ids = member.team_ids
+                const idslist = ids.split(',')
+                return idslist.length
+            }
+        })
+    },
     //是否首次注册会员
     isNewMember(memberid) {
         return co(function*() {

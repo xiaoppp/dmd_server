@@ -7,10 +7,11 @@ const util = require('../util/util')
 
 module.exports = function(server) {
     server.get('/api/applys/:memberid', findMemberApplys)
-
+    
     server.post('/api/apply/detail', restify.jsonBodyParser(), findApplyDetail)
-
+    //播种
     server.post('/api/apply/member', restify.jsonBodyParser(), apply)
+    //检查是否可以播种
     server.post('/api/apply/member/check', restify.jsonBodyParser(), checkApply)
 }
 

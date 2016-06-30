@@ -62,7 +62,7 @@ function calculateIntrest(member) {
             freezeMoney = Number(freezeMoney)
             regMoney = Number(regMoney)
 
-            const moneyt = regMoney===0 ? member.money - conf2List[0] : member.money //激活总金额为0 则返回当前用户的money－1000 否则返回用户的money
+            const moneyt = regMoney === 0 ? member.money - conf2List[0] : member.money //激活总金额为0 则返回当前用户的money－1000 否则返回用户的money
             const money = moneyt > 0 ? moneyt : 0
             const interest = (money + freezeMoney) * conf6 //日结钱数
             if (interest > 0) {

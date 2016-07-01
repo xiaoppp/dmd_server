@@ -19,7 +19,7 @@ module.exports = function(server) {
 
     //打款
     server.post('/api/pair/payment/out', restify.jsonBodyParser(), payOut)
-        //收款
+    //收款
     server.post('/api/pair/payment/in', restify.jsonBodyParser(), payIn)
 }
 
@@ -32,11 +32,19 @@ const denyPayment = (req, res, next) => {
 
 const payIn = (req, res, next) => {
     const oaid = req.params.oaid
-    const memberid = req.params.memberid
 
-    models.dmd_members.payIn(oaid, memberid)
-        .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+    co(function*() {
+        const offerApply = yield models.dmd_offer_apply.findOne({
+            where: {
+                id: oaid,
+                state: 3
+            }
+        })
+
+        models.dmd_offer_apply.payIn(offerApply)
+            .then(m => util.success(res, m))
+            .catch(error => util.fail(res, error))
+    })
 }
 
 const payOut = (req, res, next) => {

@@ -26,6 +26,8 @@ module.exports = () => {
                 yield models.dmd_offer_apply.payIn(oa)
             }
         }
+
+        return yield models.dmd_last_time.update(36)
     })
         .then(d => console.log(d))
         .catch(error => console.log(error))

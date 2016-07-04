@@ -5,6 +5,8 @@ const models = require('../mysql/index')
 const util = require('../util/util')
 const config = require('../config/config')
 const restify = require('restify')
+const path = require('path')
+const fs = require('fs')
 
 module.exports = function(server) {
     // 失败匹配
@@ -18,7 +20,7 @@ module.exports = function(server) {
     server.get('/api/pair/payment/deny/:memberid', denyPayment)
 
     //打款
-    server.post('/api/pair/payment/out', restify.jsonBodyParser(), payOut)
+    server.post('/api/pair/payment/out/:oaid', restify.bodyParser({multipartFileHandler: uploadPicture}), payOut)
     //收款
     server.post('/api/pair/payment/in', restify.jsonBodyParser(), payIn)
 }
@@ -31,6 +33,7 @@ const denyPayment = (req, res, next) => {
 }
 
 const payIn = (req, res, next) => {
+    console.log(req.params)
     const oaid = req.params.oaid
 
     co(function*() {
@@ -40,15 +43,33 @@ const payIn = (req, res, next) => {
                 state: 3
             }
         })
-
-        models.dmd_offer_apply.payIn(offerApply)
-            .then(m => util.success(res, m))
-            .catch(error => util.fail(res, error))
+        console.log(offerApply)
+        yield models.dmd_offer_apply.payIn(offerApply)
     })
+    .then(m => util.success(res, m))
+    .catch(error => util.fail(res, error))
+}
+
+const uploadPicture = (part, req, res, next) => {
+    const pairid = req.params.oaid
+    console.log(pairid)
+    const dirs = "../upload/images/payment"
+    const filename = part.filename
+    const fileExt = filename.split('.').pop();
+    const files = pairid + "_" + moment().format('YYYYMMDDhhmmss') + '.' + fileExt
+    const dir = path.join(__dirname, dirs, files)
+    const writter = fs.createWriteStream(dir)
+
+    if (part.mime === "image/png" || part.mime === "image/jpg" || part.mime === "image/jpeg" || part.mime === "image/gif") {
+        part.pipe(writter)
+    }
+    req.filespath = files
+
+    console.log(files)
 }
 
 const payOut = (req, res, next) => {
-    const pairid = req.params.pairid
+    const pairid = req.params.oaid
     const memberid = req.params.memberid
     co(function*() {
         const pair = yield models.dmd_offer_apply.findOne({
@@ -58,7 +79,25 @@ const payOut = (req, res, next) => {
                 state: 2
             }
         })
+
+        pair.state = 3
+        pair.img = req.filespath
+        pair.pay_time = moment().unix()
+        yield pair.save()
+
+        yield models.dmd_payment_log.create({
+            oaid: pair.id,
+            member_id: pair.om_id,
+            to_member_id: pair.am_id,
+            money: pair.money,
+            the_time: moment().unix(),
+            img: req.filespath
+        })
+
+        return pair
     })
+    .then(m => util.success(res, m))
+    .catch(error => util.fail(res, error))
 }
 
 const findMemberFailedPairs = (req, res, next) => {

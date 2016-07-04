@@ -7,25 +7,37 @@ const util = require('../util/util')
 const dmd_offer_apply = {
     //会员当前已收获的金额
     totalApplyMoney(applyid) {
-        return models.dmd_offer_apply.sum(
-            'money', {
-                where: {
-                    aid: applyid
-                }
-            })
+        return co(function*() {
+            const money = yield models.dmd_offer_apply.sum('money',
+                {
+                    where: {
+                        aid: applyid
+                    }
+                })
+            if (money)
+                return money
+            else
+                return 0
+        })
     },
     //会员当前已播种的金额
     totalOfferMoney(offerid) {
-        return models.dmd_offer_apply.sum(
-            'money', {
-                where: {
-                    oid: offerid
-                }
-            })
+        return co(function*() {
+            const money = yield models.dmd_offer_apply.sum('money',
+                {
+                    where: {
+                        oid: offerid
+                    }
+                })
+            if (money)
+                return money
+            else
+                return 0
+        })
     },
     //确认收款
-    payIn() {
-        return co(function*(offerApply) {
+    payIn(offerApply) {
+        return co(function*() {
 
             offerApply.state = 4
             offerApply.ent_time = moment().unix()
@@ -34,12 +46,15 @@ const dmd_offer_apply = {
             const om = yield models.dmd_members.findById(offerApply.om_id)
             const am = yield models.dmd_members.findById(offerApply.am_id)
 
+            console.log('==================om', om)
+            console.log('==================am', am)
+
             //完成收获
-            const apply = yield models.dmd_apply_help.findById(offerApply.aid)
+            let apply = yield models.dmd_apply_help.findById(offerApply.aid)
             yield finishApply(apply, am, offerApply)
 
             //完成播种
-            const offer = yield models.dmd_offer_help.findById(offerApply.oid)
+            let offer = yield models.dmd_offer_help.findById(offerApply.oid)
             yield finishOffer(offer, om, offerApply)
 
             if (offer.fst === 0) {
@@ -93,9 +108,9 @@ function finishApply(apply, applyMember, offerApply) {
 }
 
 function buildIncome(dtype, apply, memberid, sur_bonus, sur_interest, sur_money) {
-    const title = ""
-    const money = 0
-    const type = ""
+    let title = ""
+    let money = 0
+    let type = ""
 
     if (dtype === 0) {
         title = "奖金"
@@ -138,11 +153,11 @@ function finishOffer(offer, offerMember, offerApply) {
                 yield offerMember.save()
             }
 
-            const ice = 0
+            let ice = 0
             if (offer.fst === 1) {
                 ice = models.dmd_config.getConfig(23)
             } else {
-                const day = Math.ceil((moment().unix() - offer.the_time) / (60 * 60 * 24))
+                let day = Math.ceil((moment().unix() - offer.the_time) / (60 * 60 * 24))
 
                 const from_time = moment().format('MM/DD/YYYY') + " " + moment.unix(offer.the_time).format("hh:mm:ss")
                 day = from_time >= moment().format("MM/DD/YYYY hh:mm:ss") ? day : day - 1
@@ -157,7 +172,7 @@ function finishOffer(offer, offerMember, offerApply) {
             offer.ice = ice
             yield offer.save()
 
-            const text = offer.fst === 0 ? "播种" : "购买激活币";
+            let text = offer.fst === 0 ? "播种" : "购买激活币";
             yield models.dmd_income.create({
                 member_id: offerMember.id,
                 type: "money",
@@ -182,15 +197,15 @@ function send_interest(member, offer) {
         const conf27 = models.dmd_config.getConfig(27) //老会员下单间隔天数，超出不下单则不再获得奖金
         const conf28 = models.dmd_config.getConfig(28) //冻结二代以上奖金天数
 
-        const day = Math.ceil((moment().unix() - offer.the_time) / (60 * 60 * 24))
+        let day = Math.ceil((moment().unix() - offer.the_time) / (60 * 60 * 24))
 
-        const from_time = moment().format('MM/DD/YYYY') + " " + moment.unix(offer.the_time).format("hh:mm:ss")
+        let from_time = moment().format('MM/DD/YYYY') + " " + moment.unix(offer.the_time).format("hh:mm:ss")
         day = from_time >= moment().format("MM/DD/YYYY hh:mm:ss") ? day : day - 1
 
         day = day < 1 ? 1 : day
         day = day >= conf10 ? conf10 : day
 
-        const interest = offer.money * Number(conf6) * day
+        let interest = offer.money * Number(conf6) * day
 
         member.interest = member.interest + interest
         member.last_interest_time = moment().unix()
@@ -269,7 +284,7 @@ function send_team_bonus(member, offer) {
                     ]
                 })
                 if (offer) {
-                    const istr = ""
+                    let istr = ""
                     if (i == 0) {
                         parent.bonus = parent.bonus + bonus
                         yield parent.save()
@@ -277,7 +292,7 @@ function send_team_bonus(member, offer) {
                     else {
                         istr = "奖金冻结" + conf28 + "天后自动计入奖金余额。"
                     }
-                    yield dmd_income.create({
+                    yield models.dmd_income.create({
                         member_id: parent.id,
                         type: "bonus",
                         money: bonus,
@@ -293,18 +308,18 @@ function send_team_bonus(member, offer) {
 
 function send_step_award(offer, oa) {
     return co(function*() {
-        const day = Math.ceil((moment().unix() - offer.the_time) / (60 * 60 * 24))
-        const from_time = moment().format('MM/DD/YYYY') + " " + moment.unix(offer.the_time).format("hh:mm:ss")
+        let day = Math.ceil((moment().unix() - offer.the_time) / (60 * 60 * 24))
+        let from_time = moment().format('MM/DD/YYYY') + " " + moment.unix(offer.the_time).format("hh:mm:ss")
         day = from_time >= moment().format("MM/DD/YYYY hh:mm:ss") ? day : day - 1
 
         day = day < 1 ? 1 : day
-        conf24 = models.dmd_config.getConfig(24)
+        const conf24 = models.dmd_config.getConfig(24)
 
-        const ice = conf24 - day //15 投资周期（单位：天）
+        let ice = conf24 - day //15 投资周期（单位：天）
         if (offer.fst === 0) { //非首单才发团队奖
             const conf31 = models.dmd_config.getConfig(31) //播种方在2小时 - 5小时内打款的奖励比例
             const conf31List = conf31.split('-') //0.02-0.01
-            const bonus_add = 0
+            let bonus_add = 0
             const hour = (oa.pay_time - oa.the_time)/(60*60)
             if (hour < 2) {
                 bonus_add = oa.money * conf31[0]

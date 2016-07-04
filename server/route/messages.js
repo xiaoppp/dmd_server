@@ -4,6 +4,9 @@ const models = require('../mysql/index')
 const config = require('../config/config.json')
 const util = require('../util/util')
 const restify = require('restify')
+const moment = require('moment')
+const path = require('path')
+const fs = require('fs')
 
 
 module.exports = function(server) {
@@ -11,7 +14,7 @@ module.exports = function(server) {
     server.get('/api/messages/reply/:memberid', replyMessages)
 
     server.get('/api/message/:id', findMessagesById)
-    server.post('/api/message/action/leavemsg', restify.jsonBodyParser(), saveMessage)
+    server.post('/api/message/action/leavemsg/:memberid', restify.bodyParser({multipartFileHandler: uploadPicture}), upload)
 }
 
 const findMessagesList = (req, res, next) => {
@@ -38,7 +41,10 @@ const replyMessages = (req, res, next) => {
     co(function*() {
             const messages = yield models.dmd_message.findAll({
                 where: {
-                    member_id: member_id
+                    member_id: member_id,
+                    reply: {
+                        $ne: 0
+                    }
                 }
             })
 
@@ -63,9 +69,35 @@ const findMessagesById = (req, res, next) => {
         .catch(error => util.fail(res, error))
 }
 
-const saveMessage = (req, res, next) => {
+const upload = (req, res) => {
+    let message = req.params
+    message.img = req.filespath
     const leavemsg = models.dmd_message
-        .create(req.params)
-        .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .create(message)
+        .then(m => {
+            console.log(m)
+            util.success(res, m)
+        })
+        .catch(error => {
+            console.log(error)
+            util.fail(res, error)
+        })
+}
+
+const uploadPicture = (part, req, res, next) => {
+    console.log(req.params)
+
+    const dirs = "../upload/images/message"
+    const filename = part.filename
+
+    const fileExt = filename.split('.').pop();
+    const files = req.params.memberid + "_" + moment().format('YYYYMMDDhhmmss') + '.' + fileExt
+
+    const dir = path.join(__dirname, dirs, files)
+    const writter = fs.createWriteStream(dir)
+
+    if (part.mime === "image/png" || part.mime === "image/jpg" || part.mime === "image/jpeg" || part.mime === "image/gif") {
+        part.pipe(writter)
+    }
+    req.filespath = files
 }

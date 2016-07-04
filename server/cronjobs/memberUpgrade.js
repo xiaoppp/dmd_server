@@ -25,7 +25,7 @@ module.exports = () => {
                 $and: [
                         {
                             team_ids: {
-                                $ne: 0
+                                $ne: '0'
                             }
                         },
                         {
@@ -35,6 +35,8 @@ module.exports = () => {
                         }
                     ]
             }})
+
+        //console.log(members.length, '=============================')
 
         for (let i = 0; i < members.length; i++) {
             let member = members[i]
@@ -63,7 +65,8 @@ module.exports = () => {
             }
             yield member.save()
         }
-    }
+        return yield models.dmd_last_time.update(38)
+    })
     .then(d => console.log(d))
     .catch(error => console.log(error))
 }

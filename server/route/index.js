@@ -50,5 +50,5 @@ const fetchMemberInfo = (req, res, next) => {
             return result
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }

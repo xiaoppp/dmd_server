@@ -35,7 +35,7 @@ const findMoney = (req,res,next) => {
     .then(m => {
         util.success(res, m)
     })
-    .catch(error => util.fail(res, error))
+    .catch(error => util.fail(req, res, error))
 }
 
 const findBonus = (req,res,next) => {
@@ -45,7 +45,7 @@ const findBonus = (req,res,next) => {
     .then(m => {
         util.success(res, m)
     })
-    .catch(error => util.fail(res, error))
+    .catch(error => util.fail(req, res, error))
 }
 
 const findInterest = (req,res,next) => {
@@ -55,7 +55,7 @@ const findInterest = (req,res,next) => {
     .then(m => {
         util.success(res, m)
     })
-    .catch(error => util.fail(res, error))
+    .catch(error => util.fail(req, res, error))
 }
 
 const findIncome = (memberid, page, type) => {

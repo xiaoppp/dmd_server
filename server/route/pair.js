@@ -19,6 +19,8 @@ module.exports = function(server) {
 
     server.get('/api/pair/payment/deny/:memberid', denyPayment)
 
+    // server.post('/api/pair/payment/upload', restify.bodyParser({multipartFileHandler: uploadPicture}), upload)
+
     //打款
     server.post('/api/pair/payment/out/:oaid', restify.bodyParser({multipartFileHandler: uploadPicture}), payOut)
     //收款
@@ -29,7 +31,7 @@ const denyPayment = (req, res, next) => {
     const memberid = req.params.memberid
     models.dmd_members.freezeMember(memberid, "拒绝打款")
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const payIn = (req, res, next) => {
@@ -47,7 +49,7 @@ const payIn = (req, res, next) => {
         yield models.dmd_offer_apply.payIn(offerApply)
     })
     .then(m => util.success(res, m))
-    .catch(error => util.fail(res, error))
+    .catch(error => util.fail(req, res, error))
 }
 
 const uploadPicture = (part, req, res, next) => {
@@ -97,7 +99,7 @@ const payOut = (req, res, next) => {
         return pair
     })
     .then(m => util.success(res, m))
-    .catch(error => util.fail(res, error))
+    .catch(error => util.fail(req, res, error))
 }
 
 const findMemberFailedPairs = (req, res, next) => {
@@ -133,7 +135,7 @@ const findMemberFailedPairs = (req, res, next) => {
             })
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const judge = (req, res, next) => {
@@ -181,5 +183,5 @@ const remark = (req, res, next) => {
             yield member.save()
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }

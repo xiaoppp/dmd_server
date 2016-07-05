@@ -32,7 +32,7 @@ const findMessagesList = (req, res, next) => {
             offset: size * page
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const replyMessages = (req, res, next) => {
@@ -59,7 +59,7 @@ const replyMessages = (req, res, next) => {
             return replys
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const findMessagesById = (req, res, next) => {
@@ -78,10 +78,7 @@ const upload = (req, res) => {
             console.log(m)
             util.success(res, m)
         })
-        .catch(error => {
-            console.log(error)
-            util.fail(res, error)
-        })
+        .catch(error => util.fail(req, res, error))
 }
 
 const uploadPicture = (part, req, res, next) => {

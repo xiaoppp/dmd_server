@@ -32,7 +32,7 @@ module.exports = function(server) {
 const checkFirst = (req, res, next) => {
     models.dmd_members.isNewMember(req.params.memberid)
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const findChildrenAmount = (req, res, next) => {
@@ -41,7 +41,7 @@ const findChildrenAmount = (req, res, next) => {
         .then(m => {
             util.success(res, m)}
         )
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const findMemberById = (req, res, next) => {
@@ -52,7 +52,7 @@ const findMemberById = (req, res, next) => {
             }
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const findMemberByName = (req, res, next) => {
@@ -64,7 +64,7 @@ const findMemberByName = (req, res, next) => {
             }
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const findChildrenByParentId = (req, res, next) => {
@@ -92,7 +92,7 @@ const findChildrenByParentId = (req, res, next) => {
             return members
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const checkMobile = (req, res, next) => {
@@ -111,7 +111,7 @@ const checkMobile = (req, res, next) => {
             }
             util.success(res)
         })
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const signup = (req, res, next) => {
@@ -150,7 +150,7 @@ const signup = (req, res, next) => {
             return member
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const signin = (req, res, next) => {
@@ -180,10 +180,7 @@ const signin = (req, res, next) => {
             }
         })
         .then(m => util.success(res, m))
-        .catch(error => {
-            console.log(error)
-            util.fail(res, error)
-        })
+        .catch(error => util.fail(req, res, error))
 }
 
 const signout = (req, res, next) => {}
@@ -250,10 +247,7 @@ const updateMember = (req, res, next) => {
             }
         })
         .then(m => util.success(res, m))
-        .catch(error => {
-            console.log(error)
-            util.fail(res, error)
-        })
+        .catch(error => util.fail(req, res, error))
 }
 
 const resetPwd = (req, res, next) => {
@@ -291,7 +285,7 @@ const resetPwd = (req, res, next) => {
             yield member.save()
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const resetPaypwd = (req, res, next) => {
@@ -323,7 +317,7 @@ const resetPaypwd = (req, res, next) => {
             yield member.save()
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const resetSmspwd = (req, res, next) => {

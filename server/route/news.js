@@ -14,7 +14,7 @@ const findNewsById = (req, res, next) => {
     models.dmd_news
         .findById(req.params.newsid)
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const findNewsList = (req, res, next) => {
@@ -28,5 +28,5 @@ const findNewsList = (req, res, next) => {
             offset: size * page
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }

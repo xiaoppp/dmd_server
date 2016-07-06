@@ -2,8 +2,8 @@
     "development": {
         "username": "root",
         "password": null,
-        "database": "duomiduo",
-        "host": "192.168.1.102",
+        "database": "dmd_web",
+        "host": "localhost",
         "dialect": "mysql"
     },
     "test": {

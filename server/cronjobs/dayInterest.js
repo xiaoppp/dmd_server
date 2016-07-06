@@ -41,7 +41,7 @@ function calculateIntrest(member) {
         console.log(lastOffer, "======================>lastOffer")
 
         if (lastOffer && lastOffer.last_time > moment().unix() - 60*60*24*conf10) {
-            //所有排单非首单的总金额
+            //所有播种非首单的总金额
             let freezeMoney = yield models.dmd_offer_help.sum('income', {
                 where: {
                     member_id: member.id,
@@ -66,9 +66,10 @@ function calculateIntrest(member) {
 
             freezeMoney = Number(freezeMoney)
             regMoney = Number(regMoney)
-
-            const moneyt = regMoney === 0 ? member.money - conf2List[0] : member.money //激活总金额为0 则返回当前用户的money－1000 否则返回用户的money
+            //激活总金额为0 则返回当前用户的money－1000 否则返回用户的money
+            const moneyt = regMoney === 0 ? member.money - conf2List[0] : member.money
             const money = moneyt > 0 ? moneyt : 0
+            //  money + 所有排单非首单的总金额
             const interest = (money + freezeMoney) * conf6 //日结钱数
             if (interest > 0) {
                 const time = moment().unix()

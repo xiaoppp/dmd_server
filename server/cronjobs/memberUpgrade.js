@@ -42,7 +42,9 @@ module.exports = () => {
             let member = members[i]
             member.team_ids = member.team_ids.replace(/^\,/, '')
             member.team_ids = member.team_ids.replace(/\,$/, '')
+            //下属会员人数
             const allc = member.team_ids.split(',').length
+            //直推人数
             const cct = yield models.dmd_members.count({where: {
                 parent_id: member.id,
                 ok: 1

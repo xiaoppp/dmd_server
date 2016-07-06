@@ -3,6 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
+const log = require('../util/log')
 const env = process.env.NODE_ENV || "development";
 
 const config = require(path.join(__dirname, '..', 'config', 'config.json'))[env];
@@ -11,7 +12,7 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
     host: config.host,
     dialect: config.dialect,
     timestamps: false,
-    logging: true,
+    //logging: true,
     pool: {
         max: 100,
         min: 0,

@@ -9,9 +9,9 @@ module.exports = function(server) {
     server.get('/api/applys/:memberid', findMemberApplys)
 
     server.post('/api/apply/detail', restify.jsonBodyParser(), findApplyDetail)
-    //播种
+    //收获
     server.post('/api/apply/member', restify.jsonBodyParser(), apply)
-    //检查是否可以播种
+    //检查是否可以收获
     server.post('/api/apply/member/check', restify.jsonBodyParser(), checkApply)
 }
 

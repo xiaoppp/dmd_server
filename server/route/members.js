@@ -71,23 +71,21 @@ const findChildrenByParentId = (req, res, next) => {
     const parentid = req.params.parentid
 
     co(function*() {
-            const members = yield models.dmd_members
+            let members = yield models.dmd_members
                 .findAll({
                     where: {
                         parent_id: parentid
-                    },
-                    attributes: {
-                        include: [],
-                        exclude: ['team_ids']
                     }
                 })
-            members.map(m => {
-                let c = {
-                    id: m.id,
-                    name: m.truename,
-                    member: m
+            members = members.map(m => {
+                m.setDataValue('teamCount', 0)
+                if (m.team_ids && m.team_ids !== "0") {
+                    m.team_ids = m.team_ids.replace(/^\,/, '')
+                    m.team_ids = m.team_ids.replace(/\,$/, '')
+                    const teamCount = m.team_ids.split(',').length
+                    m.setDataValue('teamCount', teamCount)
                 }
-                return c
+                return m
             })
             return members
         })

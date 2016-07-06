@@ -11,11 +11,7 @@ module.exports = function(server) {
     server.get('/api/income/bonus/:memberid/:page', findBonus)
     server.get('/api/income/interest/:memberid/:page', findInterest)
 
-    server.post('/api/income/receipt/:incomeid', restify.bodyParser({multipartFileHandler: upload}), uploadReceipt)
-}
-
-const uploadReceipt = (req, res, next) => {
-
+    //server.post('/api/income/receipt/:incomeid', restify.bodyParser({multipartFileHandler: upload}), uploadReceipt)
 }
 
 const upload = (part, req, res, next) => {

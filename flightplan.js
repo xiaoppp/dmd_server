@@ -3,7 +3,7 @@ var plan = require('flightplan');
 
 // configuration
 plan.target('develop', {
-    host: '192.168.1.103',
+    host: '192.168.1.105',
     username: 'ubuntu',
     agent: process.env.SSH_AUTH_SOCK,
     failsafe: true
@@ -21,9 +21,8 @@ var productPath = '/home/dmd_server';
 
 // run commands on localhost
 plan.local(function (local) {
-
     var files = local.exec('find ./server', { silent: false })
-    local.transfer(files, developPath)
+    local.transfer(files, productPath)
 });
 
 //deploy command

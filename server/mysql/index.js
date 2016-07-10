@@ -1,12 +1,15 @@
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
-const Sequelize = require("sequelize");
+const fs = require("fs")
+const path = require("path")
+const Sequelize = require("sequelize")
 const log = require('../util/log')
-const env = process.env.NODE_ENV || "development";
 
-const config = require(path.join(__dirname, '..', 'config', 'config.json'))[env];
+let argv = process.argv[2]
+console.log('============env', argv)
+if (argv !== 'product')
+    argv = 'dev'
+const config = require(path.join(__dirname, '..', 'config', 'config.json'))[argv];
 
 const sequelize = new Sequelize(config.database, config.username, config.password, {
     host: config.host,

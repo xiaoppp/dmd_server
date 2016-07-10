@@ -89,6 +89,13 @@ const dmd_members = {
 
             yield models.sequelize.query("delete from dmd_apply_help where state = 1 and member_id =" + memberid,
                 { type: models.sequelize.QueryTypes.DELETE})
+
+                //$db->insert("ice_log", array("member_id"=>$oa['om_id'], "intro"=>"拒绝打款", "the_time"=>time()));
+            yield models.dmd_ice_log.create({
+                member_id: memberid,
+                intro: intro,
+                the_time: moment().unix()
+            })
         })
     },
     findChildrenAmount(memberid) {

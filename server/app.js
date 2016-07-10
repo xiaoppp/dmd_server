@@ -1,8 +1,23 @@
 "use strict"
 
+const os = require('os')
+const fs = require('fs')
 const restify = require('restify')
+const util = require('util')
+const log = require('./util/log')
+const moment = require('moment')
+
+const auth = require('./util/auth')
 
 let server = restify.createServer()
+
+// add route
+require('./route/route')(server)
+    // add all models
+const models = require('./mysql/index')
+require('./models_extention/model')(models)
+
+require('./util/configCache')
 
 function unknownMethodHandler(req, res) {
     if (req.method.toLowerCase() === 'options') {
@@ -21,33 +36,33 @@ function unknownMethodHandler(req, res) {
         return res.send(new restify.MethodNotAllowedError());
 }
 
-server.on('MethodNotAllowed', unknownMethodHandler);
+server.on('MethodNotAllowed', unknownMethodHandler)
 
-server.use(restify.CORS());
-server.use(restify.fullResponse());
+server.use(restify.CORS())
+server.use(restify.fullResponse())
 server.use(restify.acceptParser(server.acceptable))
-server.use(restify.authorizationParser())
+server.use(restify.gzipResponse())
+//server.use(restify.authorizationParser())
 //server.use(restify.dateParser());
 //server.use(restify.queryParser());
 //server.use(restify.jsonp());
-server.use(restify.gzipResponse())
-//server.use(restify.bodyParser())
-//server.use(restify.requestExpiry());
 
-const moment = require('moment')
+server.use(function logger(req, res, next) {
+    console.log(new Date(), req.method, req.url)
+    log.info(new Date(), req.method, req.url)
+    next()
+})
 
-
-// add route
-require('./route/route')(server)
-// add all models
-const models = require('./mysql/index')
-require('./models_extention/model')(models)
-
-require('./util/configCache')
-
-// const util = require('./util/util')
-// console.log(util.getMD5('1234'))
+server.on('uncaughtException', function(req, res, route, error) {
+    console.error(error.stack)
+    log.error(error.stack)
+    res.send(error)
+})
 
 server.listen(3000, function() {
+    console.log(moment().format())
+
+    log.info("server started at: " + moment().format())
+    //log.error("server started at: " + moment().format())
     console.log('%s listening at %s', server.name, server.url)
 })

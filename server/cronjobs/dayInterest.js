@@ -2,7 +2,7 @@
 
 const co = require('co')
 const moment = require('moment')
-const models = require('../mysql/cron')
+const models = require('../mysql/index')
 
 module.exports = () => {
     co(function*() {
@@ -11,6 +11,8 @@ module.exports = () => {
         for (let i = 0; i < members.length; i++) {
             yield calculateIntrest(members[i])
         }
+
+        return yield models.dmd_last_time.update(30)
     })
     .then(d => console.log(d))
     .catch(error => console.log(error))
@@ -32,11 +34,14 @@ function calculateIntrest(member) {
                 fst: 0 //1表示首次排单
             },
             order: [
-                [id, 'DESC']
+                ['id', 'DESC']
             ]
         })
+
+        console.log(lastOffer, "======================>lastOffer")
+
         if (lastOffer && lastOffer.last_time > moment().unix() - 60*60*24*conf10) {
-            //所有排单非首单的总金额
+            //所有播种非首单的总金额
             let freezeMoney = yield models.dmd_offer_help.sum('income', {
                 where: {
                     member_id: member.id,
@@ -50,7 +55,7 @@ function calculateIntrest(member) {
             // 所有首次激活排单的总金额
             let regMoney = yield models.dmd_offer_help.sum('income', {
                 where: {
-                    member_id: memberid,
+                    member_id: member.id,
                     state: 100,
                     fst: 1,
                     income: {
@@ -61,9 +66,10 @@ function calculateIntrest(member) {
 
             freezeMoney = Number(freezeMoney)
             regMoney = Number(regMoney)
-
-            const moneyt = regMoney===0 ? member.money - conf2List[0] : member.money //激活总金额为0 则返回当前用户的money－1000 否则返回用户的money
+            //激活总金额为0 则返回当前用户的money－1000 否则返回用户的money
+            const moneyt = regMoney === 0 ? member.money - conf2List[0] : member.money
             const money = moneyt > 0 ? moneyt : 0
+            //  money + 所有排单非首单的总金额
             const interest = (money + freezeMoney) * conf6 //日结钱数
             if (interest > 0) {
                 const time = moment().unix()

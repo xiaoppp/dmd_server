@@ -34,7 +34,7 @@ module.exports.unfreezeMoney = () => {
 
 module.exports.unfreezeBonus = () => {
     co(function*(){
-        const conf34 = models.dmd_config.getConfig(34) //最后一次执行解冻本金时间
+        const conf34 = models.dmd_config.getConfig(34) //最后一次执行解冻奖金时间
 
         const sql = "select id, member_id, money, ice, the_time from dmd_income " +
                 "where ice > 0 and the_time + ice*60*60*24 < " + moment().unix() + " and type = 'bonus'"

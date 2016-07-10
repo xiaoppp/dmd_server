@@ -17,7 +17,11 @@ const fetchMemberInfo = (req, res, next) => {
                 showNews: true
             }
             result.member = yield models.dmd_members.findById(memberid)
-            result.member.teamScope = result.member.team_ids.split(',').length
+            if (result.member.team_ids) {
+                result.member.team_ids = result.member.team_ids.replace(/^\,/, '')
+                result.member.team_ids = result.member.team_ids.replace(/\,$/, '')
+                result.teamScope = result.member.team_ids.split(',').length
+            }
 
             result.config = models.dmd_config.getConfigAll()
 
@@ -49,5 +53,5 @@ const fetchMemberInfo = (req, res, next) => {
             return result
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }

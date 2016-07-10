@@ -6,11 +6,12 @@ const util = require('../util/util')
 const restify = require('restify')
 
 module.exports = function(server) {
-    server.post('/api/offer/detail', restify.jsonBodyParser(), findOfferDetail)
-
     server.get('/api/offers/:memberid', findMemberOffers)
 
+    server.post('/api/offer/detail', restify.jsonBodyParser(), findOfferDetail)
+
     server.post('/api/offer/member', restify.jsonBodyParser(), offer)
+    //查看是否可以播种
     server.post('/api/offer/member/check', restify.jsonBodyParser(), checkOffer)
 }
 
@@ -42,7 +43,7 @@ const findMemberOffers = (req, res, next) => {
         })
     })
     .then(m => util.success(res, m))
-    .catch(error => util.fail(res, error))
+    .catch(error => util.fail(req, res, error))
 }
 
 const findOfferDetail = (req, res, next) => {
@@ -73,10 +74,9 @@ const findOfferDetail = (req, res, next) => {
         return result
     })
     .then(m => util.success(res, m))
-    .catch(error => util.fail(res, error))
+    .catch(error => util.fail(req, res, error))
 }
 
-//查看是否可以播种
 const checkOffer = (req, res, next) => {
     const money = Number(req.params.money)
     const memberid = req.params.memberid
@@ -113,10 +113,7 @@ const offer = (req, res, next) => {
         return offer
     })
     .then(m => util.success(res, m))
-    .catch(error => {
-        console.log(error)
-        util.fail(res, error)
-    })
+    .catch(error => util.fail(req, res, error))
 }
 
 function addFirstOffer(money, member, offer) {

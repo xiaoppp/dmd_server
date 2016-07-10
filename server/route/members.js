@@ -18,7 +18,9 @@ module.exports = function(server) {
     //所有下级teamids
     server.get('/api/member/children/:parentid', findChildrenByParentId)
 
-    server.post('/api/member/reset', restify.jsonBodyParser(), resetPassword)
+    server.post('/api/member/pwd/reset', restify.jsonBodyParser(), resetPwd)
+    server.post('/api/member/paypwd/reset', restify.jsonBodyParser(), resetPaypwd)
+    server.post('/api/member/smspwd/reset', restify.jsonBodyParser(), resetSmspwd)
 
     server.post('/api/member/signin', restify.jsonBodyParser(), signin)
     server.post('/api/member/signout', restify.jsonBodyParser(), signout)
@@ -30,7 +32,7 @@ module.exports = function(server) {
 const checkFirst = (req, res, next) => {
     models.dmd_members.isNewMember(req.params.memberid)
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const findChildrenAmount = (req, res, next) => {
@@ -39,7 +41,7 @@ const findChildrenAmount = (req, res, next) => {
         .then(m => {
             util.success(res, m)}
         )
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const findMemberById = (req, res, next) => {
@@ -50,30 +52,7 @@ const findMemberById = (req, res, next) => {
             }
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
-}
-
-const resetPassword = (req, res, next) => {
-    let username = req.params.username
-    let mobile = req.params.mobile
-    let pwd = req.params.pwd
-
-    co(function*() {
-            const member = models.dmd_members.findOne({
-                where: {
-                    username: username
-                }
-            })
-
-            if (member.state === 0) {
-                throw new Exception("该会员被冻结")
-            }
-
-            member.pwd = util.getMd5(pwd)
-            yield member.save()
-        })
-        .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const findMemberByName = (req, res, next) => {
@@ -85,35 +64,33 @@ const findMemberByName = (req, res, next) => {
             }
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const findChildrenByParentId = (req, res, next) => {
     const parentid = req.params.parentid
 
     co(function*() {
-            const members = yield models.dmd_members
+            let members = yield models.dmd_members
                 .findAll({
                     where: {
                         parent_id: parentid
-                    },
-                    attributes: {
-                        include: [],
-                        exclude: ['team_ids']
                     }
                 })
-            members.map(m => {
-                let c = {
-                    id: m.id,
-                    name: m.truename,
-                    member: m
+            members = members.map(m => {
+                m.setDataValue('teamCount', 0)
+                if (m.team_ids && m.team_ids !== "0") {
+                    m.team_ids = m.team_ids.replace(/^\,/, '')
+                    m.team_ids = m.team_ids.replace(/\,$/, '')
+                    const teamCount = m.team_ids.split(',').length
+                    m.setDataValue('teamCount', teamCount)
                 }
-                return c
+                return m
             })
             return members
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const checkMobile = (req, res, next) => {
@@ -132,7 +109,7 @@ const checkMobile = (req, res, next) => {
             }
             util.success(res)
         })
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const signup = (req, res, next) => {
@@ -171,7 +148,7 @@ const signup = (req, res, next) => {
             return member
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const signin = (req, res, next) => {
@@ -201,10 +178,7 @@ const signin = (req, res, next) => {
             }
         })
         .then(m => util.success(res, m))
-        .catch(error => {
-            console.log(error)
-            util.fail(res, error)
-        })
+        .catch(error => util.fail(req, res, error))
 }
 
 const signout = (req, res, next) => {}
@@ -271,8 +245,79 @@ const updateMember = (req, res, next) => {
             }
         })
         .then(m => util.success(res, m))
-        .catch(error => {
-            console.log(error)
-            util.fail(res, error)
+        .catch(error => util.fail(req, res, error))
+}
+
+const resetPwd = (req, res, next) => {
+    let memberid = req.params.memberid
+    let oldpwd = req.params.oldpwd
+    let pwd = req.params.pwd
+    let repwd = req.params.repwd
+    let paypwd = req.params.paypwd
+
+    co(function*() {
+            const member = yield models.dmd_members.findById(memberid)
+
+            if (member.state === 0) {
+                yield Promise.reject('该会员被冻结')
+            }
+
+            if (!pwd || !repwd || !paypwd) {
+                yield Promise.reject('安全密码不能为空')
+            }
+
+            if (member.pwd === oldpwd) {
+                yield Promise.reject('原密码输入错误')
+            }
+
+            if (pwd !== repwd) {
+                yield Promise.reject('密码输入不一致')
+            }
+
+            if (member.pay_pwd !== paypwd)
+            {
+                yield Promise.reject('安全密码输入错误')
+            }
+
+            member.pwd = util.getMd5(pwd)
+            yield member.save()
         })
+        .then(m => util.success(res, m))
+        .catch(error => util.fail(req, res, error))
+}
+
+const resetPaypwd = (req, res, next) => {
+    let memberid = req.params.memberid
+    let repaypwd = req.params.repaypwd
+    let paypwd = req.params.paypwd
+
+    co(function*() {
+            const member = yield models.dmd_members.findById(memberid)
+
+            if (member.state === 0) {
+                yield Promise.reject('该会员被冻结')
+            }
+
+            if (!reqaypwd || !paypwd) {
+                yield Promise.reject('安全密码不能为空')
+            }
+
+            if (repaypwd !== paypwd) {
+                yield Promise.reject('两次输入的安全密码不一致')
+            }
+
+            if (member.pwd === paypwd)
+            {
+                yield Promise.reject('安全密码不能与登录密码一样')
+            }
+
+            member.pwd = util.getMd5(pwd)
+            yield member.save()
+        })
+        .then(m => util.success(res, m))
+        .catch(error => util.fail(req, res, error))
+}
+
+const resetSmspwd = (req, res, next) => {
+
 }

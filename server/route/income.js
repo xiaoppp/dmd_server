@@ -11,11 +11,7 @@ module.exports = function(server) {
     server.get('/api/income/bonus/:memberid/:page', findBonus)
     server.get('/api/income/interest/:memberid/:page', findInterest)
 
-    server.post('/api/income/receipt/:incomeid', restify.bodyParser({multipartFileHandler: upload}), uploadReceipt)
-}
-
-const uploadReceipt = (req, res, next) => {
-
+    //server.post('/api/income/receipt/:incomeid', restify.bodyParser({multipartFileHandler: upload}), uploadReceipt)
 }
 
 const upload = (part, req, res, next) => {
@@ -35,7 +31,7 @@ const findMoney = (req,res,next) => {
     .then(m => {
         util.success(res, m)
     })
-    .catch(error => util.fail(res, error))
+    .catch(error => util.fail(req, res, error))
 }
 
 const findBonus = (req,res,next) => {
@@ -45,7 +41,7 @@ const findBonus = (req,res,next) => {
     .then(m => {
         util.success(res, m)
     })
-    .catch(error => util.fail(res, error))
+    .catch(error => util.fail(req, res, error))
 }
 
 const findInterest = (req,res,next) => {
@@ -55,7 +51,7 @@ const findInterest = (req,res,next) => {
     .then(m => {
         util.success(res, m)
     })
-    .catch(error => util.fail(res, error))
+    .catch(error => util.fail(req, res, error))
 }
 
 const findIncome = (memberid, page, type) => {

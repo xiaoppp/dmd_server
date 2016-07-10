@@ -9,8 +9,9 @@ module.exports = function(server) {
     server.get('/api/applys/:memberid', findMemberApplys)
 
     server.post('/api/apply/detail', restify.jsonBodyParser(), findApplyDetail)
-
+    //收获
     server.post('/api/apply/member', restify.jsonBodyParser(), apply)
+    //检查是否可以收获
     server.post('/api/apply/member/check', restify.jsonBodyParser(), checkApply)
 }
 
@@ -42,7 +43,7 @@ const findApplyDetail = (req, res, next) => {
         return result
     })
     .then(m => util.success(res, m))
-    .catch(error => util.fail(res, error))
+    .catch(error => util.fail(req, res, error))
 }
 
 const findMemberApplys = (req, res, next) => {
@@ -72,7 +73,7 @@ const findMemberApplys = (req, res, next) => {
         })
     })
     .then(m => util.success(res, m))
-    .catch(error => util.fail(res, error))
+    .catch(error => util.fail(req, res, error))
 }
 
 const checkApply = (req, res, next) => {
@@ -84,7 +85,7 @@ const checkApply = (req, res, next) => {
         yield models.dmd_apply_help.checkApply(money, member)
     })
     .then(m => util.success(res, m))
-    .catch(error => util.fail(res, error))
+    .catch(error => util.fail(req, res, error))
 }
 
 const apply = (req, res, next) => {
@@ -109,5 +110,5 @@ const apply = (req, res, next) => {
         return apply
     })
     .then(m => util.success(res, m))
-    .catch(error => util.fail(res, error))
+    .catch(error => util.fail(req, res, error))
 }

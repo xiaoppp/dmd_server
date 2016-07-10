@@ -9,27 +9,46 @@ require('./util/configCache')
 const match = require('./cronjobs/match')
 const dayInterest = require('./cronjobs/dayInterest')
 const unfreeze = require('./cronjobs/unfreeze')
+const offerPaymentOut = require('./cronjobs/offerPaymentOut')
+const applyPaymentOut = require('./cronjobs/offerPaymentOut')
+const memberUpgrade = require('./cronjobs/memberUpgrade')
 
 const CronJob = require('cron').CronJob;
+
+//unfreeze.unfreezeMoney()
+//memberUpgrade()
+//offerPaymentOut()
+//applyPaymentOut()
 
 // */2 * * * * * runs every 2 second
 // */3 * * * * * runs every 3 second
 // 0 */3 * * * * runs every 3 minutes
 // 0 */5 * * * * runs every 5 minutes
 
-// const testJob = new CronJob({
-//     cronTime: '*/1 * * * * *',
-//     onTick: function() {
-//         console.log('===============================1')
-//         console.log('test job')
-//     },
-//     onComplete: function() {
-//         console.log('===============================2')
-//         console.log('complete job')
-//     },
-//     start: true,
-//     timeZone: 'Asia/Shanghai'
-// })
+//每天升级1次
+const memberUpgradeJob = new CronJob({
+    cronTime: '0 1 0 * * *',
+    onTick: function() {
+        console.log('===============================1')
+        console.log('run auto memberUpgrade')
+        memberUpgrade()
+    },
+    start: true,
+    timeZone: 'Asia/Shanghai'
+})
+
+//每日24点计算日结
+const dayInterestJob = new CronJob({
+    cronTime: '0 10 0 * * *',
+    onTick: function() {
+        console.log('===============================1')
+        console.log('run day interest')
+        dayInterest()
+    },
+    start: true,
+    timeZone: 'Asia/Shanghai'
+})
+
 
 //每5分钟自动匹配
 const matchJob = new CronJob({
@@ -43,21 +62,11 @@ const matchJob = new CronJob({
     timeZone: 'Asia/Shanghai'
 })
 
-//每日24点计算日结
-const dayInterestJob = new CronJob({
-    cronTime: '0 3 */24 * * *',
-    onTick: function() {
-        console.log('===============================1')
-        console.log('run day interest')
-        dayInterest()
-    },
-    start: true,
-    timeZone: 'Asia/Shanghai'
-})
+
 
 // 解冻本金
 const unFreezeMoneyJob = new CronJob({
-    cronTime: '0 */10 * * * *',
+    cronTime: '0 */20 * * * *',
     onTick: function() {
         console.log('===========unFreezeMoneyJob')
         unfreeze.unfreezeMoney()
@@ -68,7 +77,7 @@ const unFreezeMoneyJob = new CronJob({
 
 //解冻奖金
 const unFreezeBounsJob = new CronJob({
-    cronTime: '59 */10 * * * *',
+    cronTime: '30 */20 * * * *',
     onTick: function() {
         console.log('===========unFreezeBonusJob')
         unfreeze.unfreezeBonus()
@@ -77,11 +86,20 @@ const unFreezeBounsJob = new CronJob({
     timeZone: 'Asia/Shanghai'
 })
 
-// const regJob = new CronJob({
-//     cronTime: '* * 5 * * *',
-//     onTick: function() {
-//         match()
-//     },
-//     start: false,
-//     timeZone: 'America/Los_Angeles'
-// })
+const applyPaymentOutJob = new CronJob({
+    cronTime: '10 */10 * * * *',
+    onTick: function() {
+        match()
+    },
+    start: true,
+    timeZone: 'Asia/Shanghai'
+})
+
+const offerPaymentOutJob = new CronJob({
+    cronTime: '40 */10 * * * *',
+    onTick: function() {
+        match()
+    },
+    start: true,
+    timeZone: 'Asia/Shanghai'
+})

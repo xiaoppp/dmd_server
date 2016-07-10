@@ -1,4 +1,5 @@
 const crypto = require('crypto')
+const log = require('./log')
 
 const getMD5 = (mobile) => {
     const a = crypto.createHash('md5').update(mobile).digest('hex')
@@ -13,7 +14,10 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const fail = (res, errorMessage, code) => {
+const fail = (req, res, errorMessage, code) => {
+    log.error({req: req}, 'error request');
+    log.error({res: res}, errorMessage)
+
     code == undefined || 0
     const message = {
         isSuccess: false,
@@ -22,7 +26,6 @@ const fail = (res, errorMessage, code) => {
             code: code
         }
     }
-    console.log(errorMessage)
     res.send(message)
 }
 

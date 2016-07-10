@@ -10,14 +10,14 @@ plan.target('develop', {
 });
 
 plan.target('product', {
-    host: '121.41.166.117',
+    host: '112.124.15.7',
     username: 'root',
     agent: process.env.SSH_AUTH_SOCK,
     failsafe: true
 });
 
 var developPath = '/home/ubuntu/dmd_server';
-var productPath = '/home/ubuntu';
+var productPath = '/home/dmd_server';
 
 // run commands on localhost
 plan.local(function (local) {

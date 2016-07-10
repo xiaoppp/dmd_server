@@ -12,7 +12,7 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
     host: config.host,
     dialect: config.dialect,
     timestamps: false,
-    //logging: true,
+    //logging: log.info.bind(log),
     pool: {
         max: 100,
         min: 0,
@@ -23,11 +23,9 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
 sequelize
     .authenticate()
     .then(function(err) {
-        log.info('Connection has been established successfully.')
         console.log('Connection has been established successfully.')
     })
     .catch(function(err) {
-        log.error('Unable to connect to the database:', err)
         console.log('Unable to connect to the database:', err)
     })
 

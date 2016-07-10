@@ -19,10 +19,10 @@ module.exports = function(server) {
 
     server.get('/api/pair/payment/deny/:memberid', denyPayment)
 
-    // server.post('/api/pair/payment/upload', restify.bodyParser({multipartFileHandler: uploadPicture}), upload)
+    server.post('/api/pair/payment/mobile/upload', restify.bodyParser({multipartFileHandler: uploadPicture}), upload)
 
     //打款
-    server.post('/api/pair/payment/out/:oaid', restify.bodyParser({multipartFileHandler: uploadPicture}), payOut)
+    server.post('/api/pair/payment/out', restify.jsonBodyParser(), payOut)
     //收款
     server.post('/api/pair/payment/in', restify.jsonBodyParser(), payIn)
 }
@@ -53,26 +53,31 @@ const payIn = (req, res, next) => {
 }
 
 const uploadPicture = (part, req, res, next) => {
-    const pairid = req.params.oaid
-    console.log(pairid)
-    const dirs = "../upload/images/payment"
+    const dirs = "/var/www/html/images/payment"
     const filename = part.filename
-    const fileExt = filename.split('.').pop();
-    const files = pairid + "_" + moment().format('YYYYMMDDhhmmss') + '.' + fileExt
-    const dir = path.join(__dirname, dirs, files)
+    const dir = path.join(dirs, filename)
     const writter = fs.createWriteStream(dir)
 
     if (part.mime === "image/png" || part.mime === "image/jpg" || part.mime === "image/jpeg" || part.mime === "image/gif") {
         part.pipe(writter)
     }
-    req.filespath = files
+    req.filespath = filename
+    console.log(filename)
+}
 
-    console.log(files)
+const upload = (req, res, next) => {
+    console.log(req.filespath)
+    if (req.filespath) {
+        util.success(res, req.filespath)
+    }else {
+        util.fail(req, res, error)
+    }
 }
 
 const payOut = (req, res, next) => {
     const pairid = req.params.oaid
     const memberid = req.params.memberid
+    const url = req.params.imgurl
     co(function*() {
         const pair = yield models.dmd_offer_apply.findOne({
             where: {
@@ -83,7 +88,7 @@ const payOut = (req, res, next) => {
         })
 
         pair.state = 3
-        pair.img = req.filespath
+        pair.img = imgurl
         pair.pay_time = moment().unix()
         yield pair.save()
 
@@ -149,7 +154,7 @@ const judge = (req, res, next) => {
             yield offerapply.save()
         })
         .then(m => util.success(res, m))
-        .catch(error => util.fail(res, error))
+        .catch(error => util.fail(req, res, error))
 }
 
 const remark = (req, res, next) => {

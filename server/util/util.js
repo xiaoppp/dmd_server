@@ -18,6 +18,8 @@ const fail = (req, res, errorMessage, code) => {
     log.error({req: req}, 'error request');
     log.error({res: res}, errorMessage)
 
+    console.log(errorMessage)
+
     code == undefined || 0
     const message = {
         isSuccess: false,

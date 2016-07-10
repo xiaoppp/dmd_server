@@ -76,9 +76,7 @@ const dmd_apply_help = {
             if (money < Number(conf3list[0])) {
                 yield Promise.reject('收获金额不能小于' + conf3list[0])
             }
-            console.log(money)
-            console.log(Number(conf3list[1]))
-            console.log(money % Number(conf3list[1]))
+
             if(money % Number(conf3list[1]) !== 0) {
                 yield Promise.reject("收获金额必须要是" + conf3list[1] + "的整倍数")
             }
@@ -86,7 +84,8 @@ const dmd_apply_help = {
             console.log("===============")
 
             const applyTotalMoney = yield models.dmd_apply_help.applyTotalMoney(member.id)
-            if (money > member.money + member.bouns + member.interest - applyTotalMoney) {
+
+            if (money > member.money + member.bonus + member.interest - applyTotalMoney) {
                 yield Promise.reject('已收获总金额不能大于未提现总金额')
             }
 

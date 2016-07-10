@@ -106,7 +106,7 @@ const apply = (req, res, next) => {
             state: 1,
             type: money
         })
-
+        console.log(apply.id)
         return apply
     })
     .then(m => util.success(res, m))

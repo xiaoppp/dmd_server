@@ -53,9 +53,9 @@ const payIn = (req, res, next) => {
 }
 
 const uploadPicture = (part, req, res, next) => {
-    const dirs = "../upload/images/payment"
+    const dirs = "/var/www/html/images/payment"
     const filename = part.filename
-    const dir = path.join(__dirname, dirs, filename)
+    const dir = path.join(dirs, filename)
     const writter = fs.createWriteStream(dir)
 
     if (part.mime === "image/png" || part.mime === "image/jpg" || part.mime === "image/jpeg" || part.mime === "image/gif") {

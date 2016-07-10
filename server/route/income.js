@@ -61,35 +61,36 @@ const findIncome = (memberid, page, type) => {
     return co(function*() {
         let result = {}
 
-        const incomeCount = yield models.dmd_income.count({
-            where: {
-                member_id: memberid,
-                type: type
-            }
-        })
-        const errorCount = yield models.dmd_income_error.count({
-            where: {
-                member_id: memberid,
-                type: type
-            }
-        })
+        result.count = incomeCount
+        let sql = ""
 
-        result.count = incomeCount + errorCount
-        const offset = size * page
-        const limit = size
+        if (page === 0) {
+            sql = "select * from dmd_income where and member_id = " + memberid +
+            " (intro not like '%您的第%级下属%' or intro like '%您的第1级下属%' or intro like '%您的第2级下属%') " +
+            "order by the_time desc"
+        }
+        else {
+            const offset = size * page
+            const limit = size
 
-        console.log('===================')
-        console.log(offset, size)
+            sql = "select * from dmd_income where and member_id = " + memberid +
+            " (intro not like '%您的第%级下属%' or intro like '%您的第1级下属%' or intro like '%您的第2级下属%') " +
+            "order by the_time desc limit "+offset+","+limit
+        }
 
-        const sql =
-         "select * from " +
-         "(select * from dmd_income " +
-         "union all " +
-         "select * from dmd_income_error)t " +
-         "where member_id="+memberid+" and type='"+type+"'" +
-         "order by the_time desc limit "+offset+","+limit
+        const sumbonusSql = "select sum(money) from dmd_income where member_id = " + memberid + " and type = 'bonus' and money > 0 and ice > 0 and intro like '%您的第%级下属%' and intro not like '%您的第1级下属%' and intro not like '%您的第2级下属%'"
 
-        result.rows = yield models.sequelize.query(sql, { type: models.sequelize.QueryTypes.SELECT})
+        const sumbonus = yield models.sequelize.query(bonusSumSql, { type: models.sequelize.QueryTypes.SELECT})
+
+        const incomes = yield models.sequelize.query(sql, { type: models.sequelize.QueryTypes.SELECT})
+
+        for (let i = 0; i < incomes.length; i++) {
+            incomes[i] = incomes[i].replace('奖金冻结60天后自动计入奖金余额', '奖金冻结30天后自动计入奖金余额')
+            incomes[i] = incomes[i].replace('奖金冻结50天后自动计入奖金余额', '奖金冻结30天后自动计入奖金余额')
+            incomes[i] = incomes[i].replace('奖金冻结40天后自动计入奖金余额', '奖金冻结30天后自动计入奖金余额')
+        }
+
+        result.rows = incomes
 
         result.money_ice = yield models.dmd_offer_help.sum('income', {
             where: {

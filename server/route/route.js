@@ -1,7 +1,7 @@
 "use strict"
 
 module.exports = function (server) {
-    server.get('/', (req, res, next) => {
+    server.get('/api/test', (req, res, next) => {
         res.send("welcome duomiduo backend api server...")
     });
 

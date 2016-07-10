@@ -1,23 +1,16 @@
 {
-    "development": {
+    "dev": {
         "username": "root",
-        "password": null,
-        "database": "dmd_web",
+        "password": "",
+        "database": "dmd20160709",
+        "host": "192.168.1.105",
+        "dialect": "mysql"
+    },
+    "product": {
+        "username": "root",
+        "password": "Duomiduo123!@#",
+        "database": "dmd20160709V2",
         "host": "localhost",
-        "dialect": "mysql"
-    },
-    "test": {
-        "username": "root",
-        "password": null,
-        "database": "duomiduo",
-        "host": "192.168.1.107",
-        "dialect": "mysql"
-    },
-    "production": {
-        "username": "root",
-        "password": null,
-        "database": "duomiduo",
-        "host": "192.168.1.107",
         "dialect": "mysql"
     },
     "cronjob": {

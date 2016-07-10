@@ -62,7 +62,7 @@ server.on('uncaughtException', function(req, res, route, error) {
 server.listen(3000, function() {
     console.log(moment().format())
 
-    log.info("server started at: " + moment().format())
+    //log.info("server started at: " + moment().format())
     //log.error("server started at: " + moment().format())
     console.log('%s listening at %s', server.name, server.url)
 })

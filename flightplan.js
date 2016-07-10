@@ -3,27 +3,26 @@ var plan = require('flightplan');
 
 // configuration
 plan.target('develop', {
-    host: '192.168.1.103',
+    host: '192.168.1.105',
     username: 'ubuntu',
     agent: process.env.SSH_AUTH_SOCK,
     failsafe: true
 });
 
 plan.target('product', {
-    host: '121.41.166.117',
+    host: '112.124.15.7',
     username: 'root',
     agent: process.env.SSH_AUTH_SOCK,
     failsafe: true
 });
 
 var developPath = '/home/ubuntu/dmd_server';
-var productPath = '/home/ubuntu';
+var productPath = '/home/dmd_server';
 
 // run commands on localhost
 plan.local(function (local) {
-
     var files = local.exec('find ./server', { silent: false })
-    local.transfer(files, developPath)
+    local.transfer(files, productPath)
 });
 
 //deploy command

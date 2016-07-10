@@ -1,18 +1,21 @@
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
-const Sequelize = require("sequelize");
+const fs = require("fs")
+const path = require("path")
+const Sequelize = require("sequelize")
 const log = require('../util/log')
-const env = process.env.NODE_ENV || "development";
 
-const config = require(path.join(__dirname, '..', 'config', 'config.json'))[env];
+let argv = process.argv[2]
+console.log('============env', argv)
+if (argv !== 'product')
+    argv = 'dev'
+const config = require(path.join(__dirname, '..', 'config', 'config.json'))[argv];
 
 const sequelize = new Sequelize(config.database, config.username, config.password, {
     host: config.host,
     dialect: config.dialect,
     timestamps: false,
-    //logging: true,
+    //logging: log.info.bind(log),
     pool: {
         max: 100,
         min: 0,
@@ -23,11 +26,9 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
 sequelize
     .authenticate()
     .then(function(err) {
-        log.info('Connection has been established successfully.')
         console.log('Connection has been established successfully.')
     })
     .catch(function(err) {
-        log.error('Unable to connect to the database:', err)
         console.log('Unable to connect to the database:', err)
     })
 

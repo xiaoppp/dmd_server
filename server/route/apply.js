@@ -102,7 +102,7 @@ const apply = (req, res, next) => {
 
     co(function*() {
         const member = yield models.dmd_members.findById(memberid)
-        const apply = yield models.dmd_apply_help.findOne({where:
+        const lastapply = yield models.dmd_apply_help.findOne({where:
             {
                 member_id: member.id
             },
@@ -111,7 +111,7 @@ const apply = (req, res, next) => {
             ]
         })
 
-        yield models.dmd_apply_help.checkApply(money, member, apply)
+        yield models.dmd_apply_help.checkApply(money, member, lastapply)
 
         const the_time = moment().unix()
         const apply = yield models.dmd_apply_help.create({

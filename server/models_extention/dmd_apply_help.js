@@ -53,7 +53,7 @@ const dmd_apply_help = {
             })
     },
     //检查是否可以播种
-    checkApply(money, member) {
+    checkApply(money, member, apply) {
         return co(function*() {
             const conf22 = models.dmd_config.getConfig(22) //系统是否允许收获
             const conf22list = conf22.split('-')
@@ -87,6 +87,10 @@ const dmd_apply_help = {
 
             if (money > member.money + member.bonus + member.interest - applyTotalMoney) {
                 yield Promise.reject('已收获总金额不能大于未提现总金额')
+            }
+
+            if (apply && apply.state < 100) {
+                yield Promise.reject("上一次的收获还未完成")
             }
 
             const conf8 = models.dmd_config.getConfig(8) //收获每天最高限额（单位：元）

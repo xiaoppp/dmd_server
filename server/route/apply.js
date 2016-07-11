@@ -82,7 +82,15 @@ const checkApply = (req, res, next) => {
 
     co(function*() {
         const member = yield models.dmd_members.findById(memberid)
-        yield models.dmd_apply_help.checkApply(money, member)
+        const apply = yield models.dmd_apply_help.findOne({where:
+            {
+                member_id: member.id
+            },
+            order: [
+                ['the_time', 'desc']
+            ]
+        })
+        yield models.dmd_apply_help.checkApply(money, member, apply)
     })
     .then(m => util.success(res, m))
     .catch(error => util.fail(req, res, error))
@@ -94,8 +102,16 @@ const apply = (req, res, next) => {
 
     co(function*() {
         const member = yield models.dmd_members.findById(memberid)
+        const apply = yield models.dmd_apply_help.findOne({where:
+            {
+                member_id: member.id
+            },
+            order: [
+                ['the_time', 'desc']
+            ]
+        })
 
-        yield models.dmd_apply_help.checkApply(money, member)
+        yield models.dmd_apply_help.checkApply(money, member, apply)
 
         const the_time = moment().unix()
         const apply = yield models.dmd_apply_help.create({

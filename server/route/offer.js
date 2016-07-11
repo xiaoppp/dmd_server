@@ -83,7 +83,15 @@ const checkOffer = (req, res, next) => {
 
     co(function*() {
         const member = yield models.dmd_members.findById(memberid)
-        yield models.dmd_offer_help.checkOffer(money, member)
+        const lastoffer = yield models.dmd_offer_help.findOne({where:
+            {
+                member_id: member.id
+            },
+            order: [
+                ['the_time', 'desc']
+            ]
+        })
+        yield models.dmd_offer_help.checkOffer(money, member, lastoffer)
     })
     .then(m => util.success(res, m))
     .catch(error => util.fail(res, error))

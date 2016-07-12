@@ -66,10 +66,9 @@ const findMemberApplys = (req, res, next) => {
                     aid: a.id
                 }
             })
-            return {
-                apply: a,
-                pct: count
-            }
+
+            a.setDataValue('pct',count)
+            return a
         })
     })
     .then(m => util.success(res, m))

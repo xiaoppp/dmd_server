@@ -36,10 +36,8 @@ const findMemberOffers = (req, res, next) => {
                     oid: o.id
                 }
             })
-            return {
-                offer: o,
-                pct: count
-            }
+            o.setDataValue('pct',count)
+            return o
         })
     })
     .then(m => util.success(res, m))
@@ -176,5 +174,6 @@ function addOffer(money, member) {
             code: "O" + member.id + the_time,
             state: 1
         })
+        return offer
     })
 }

@@ -81,13 +81,16 @@ const dmd_apply_help = {
                 yield Promise.reject("收获金额必须要是" + conf3list[1] + "的整倍数")
             }
 
-            console.log("===============")
-
             const applyTotalMoney = yield models.dmd_apply_help.applyTotalMoney(member.id)
+
+            console.log("===============")
+            console.log(member.money + member.bonus + member.interest - applyTotalMoney)
 
             if (money > member.money + member.bonus + member.interest - applyTotalMoney) {
                 yield Promise.reject('已收获总金额不能大于未提现总金额')
             }
+
+            console.log(apply.state)
 
             if (apply && apply.state < 100) {
                 yield Promise.reject("上一次的收获还未完成")

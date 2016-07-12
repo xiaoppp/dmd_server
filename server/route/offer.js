@@ -167,14 +167,11 @@ function addFirstOffer(money, member, offer) {
 
 function addOffer(money, member) {
     const the_time = moment().unix()
-
-    return co(function*() {
-        const offer = yield models.dmd_offer_help.create({
-            member_id: member.id,
-            money: money,
-            the_time: the_time,
-            code: "O" + member.id + the_time,
-            state: 1
-        })
+    return models.dmd_offer_help.create({
+        member_id: member.id,
+        money: money,
+        the_time: the_time,
+        code: "O" + member.id + the_time,
+        state: 1
     })
 }

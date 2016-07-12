@@ -2,6 +2,7 @@ const crypto = require('crypto')
 const log = require('./log')
 
 const getMD5 = (mobile) => {
+    console.log(mobile)
     const a = crypto.createHash('md5').update(mobile).digest('hex')
     const b = crypto.createHash('sha1').update('tq2bf3Vx1qSnp' + mobile).digest('hex')
     const c = crypto.createHash('md5').update(a + b).digest('hex')

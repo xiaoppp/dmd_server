@@ -66,10 +66,9 @@ const findMemberApplys = (req, res, next) => {
                     aid: a.id
                 }
             })
-            return {
-                apply: a,
-                pct: count
-            }
+
+            a.setDataValue('pct',count)
+            return a
         })
     })
     .then(m => util.success(res, m))
@@ -102,7 +101,7 @@ const apply = (req, res, next) => {
 
     co(function*() {
         const member = yield models.dmd_members.findById(memberid)
-        const lastApply = yield models.dmd_apply_help.findOne({where:
+        const lastapply = yield models.dmd_apply_help.findOne({where:
             {
                 member_id: member.id
             },
@@ -111,7 +110,7 @@ const apply = (req, res, next) => {
             ]
         })
 
-        yield models.dmd_apply_help.checkApply(money, member, lastApply)
+        yield models.dmd_apply_help.checkApply(money, member, lastapply)
 
         const the_time = moment().unix()
         const apply = yield models.dmd_apply_help.create({

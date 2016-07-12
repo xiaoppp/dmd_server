@@ -36,10 +36,8 @@ const findMemberOffers = (req, res, next) => {
                     oid: o.id
                 }
             })
-            return {
-                offer: o,
-                pct: count
-            }
+            o.setDataValue('pct',count)
+            return o
         })
     })
     .then(m => util.success(res, m))
@@ -167,11 +165,14 @@ function addFirstOffer(money, member, offer) {
 
 function addOffer(money, member) {
     const the_time = moment().unix()
-    return models.dmd_offer_help.create({
-        member_id: member.id,
-        money: money,
-        the_time: the_time,
-        code: "O" + member.id + the_time,
-        state: 1
+    return co(function*() {
+        const offer = yield models.dmd_offer_help.create({
+            member_id: member.id,
+            money: money,
+            the_time: the_time,
+            code: "O" + member.id + the_time,
+            state: 1
+        })
+        return offer
     })
 }

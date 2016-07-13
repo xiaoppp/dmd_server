@@ -7,10 +7,10 @@
         "dialect": "mysql"
     },
     "product": {
-        "username": "root",
+        "username": "duomiduo",
         "password": "Duomiduo123!@#",
-        "database": "dmd060711",
-        "host": "localhost",
+        "database": "duomiduo1",
+        "host": "rm-bp145d8j3uo7306kv.mysql.rds.aliyuncs.com",
         "dialect": "mysql"
     },
     "cronjob": {

@@ -19,14 +19,22 @@ const findNewsById = (req, res, next) => {
 
 const findNewsList = (req, res, next) => {
     const page = req.params.page - 1
-
     const size = config.pagination.size
 
-    models.dmd_news
-        .findAndCountAll({
-            limit: size,
-            offset: size * page
-        })
-        .then(m => util.success(res, m))
-        .catch(error => util.fail(req, res, error))
+    console.log(page, "===========")
+    if (page === -1) {
+        models.dmd_news
+            .findAndCountAll()
+            .then(m => util.success(res, m))
+            .catch(error => util.fail(req, res, error))
+    }
+    else {
+        models.dmd_news
+            .findAndCountAll({
+                limit: size,
+                offset: size * page
+            })
+            .then(m => util.success(res, m))
+            .catch(error => util.fail(req, res, error))
+    }
 }

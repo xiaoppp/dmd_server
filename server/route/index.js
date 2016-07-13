@@ -7,6 +7,7 @@ const util = require('../util/util')
 
 module.exports = function(server) {
     server.get('/api/index/info/:memberid', fetchMemberInfo)
+    server.get('/api/index/refresh/:memberid', refresh)
 }
 
 const fetchMemberInfo = (req, res, next) => {
@@ -17,7 +18,9 @@ const fetchMemberInfo = (req, res, next) => {
                 showNews: true
             }
             result.member = yield models.dmd_members.findById(memberid)
+            console.log("============team_ids")
             if (result.member.team_ids) {
+                console.log(result.member.team_ids)
                 result.member.team_ids = result.member.team_ids.replace(/^\,/, '')
                 result.member.team_ids = result.member.team_ids.replace(/\,$/, '')
                 result.teamScope = result.member.team_ids.split(',').length
@@ -44,7 +47,6 @@ const fetchMemberInfo = (req, res, next) => {
 
             // 冻结本金总额
             result.moneyFreeze = yield models.dmd_offer_help.memberFreezeIncome(memberid)
-
             // 冻结奖金总额
             result.bonusFreeze = yield models.dmd_income.memberFreezeBonus(memberid)
 
@@ -54,4 +56,21 @@ const fetchMemberInfo = (req, res, next) => {
         })
         .then(m => util.success(res, m))
         .catch(error => util.fail(req, res, error))
+}
+
+const refresh = (req, res, next) => {
+    const memberid = req.params.memberid
+
+    co(function*() {
+        let result = {}
+        result.member = yield models.dmd_members.findById(memberid)
+        // 冻结本金总额
+        result.moneyFreeze = yield models.dmd_offer_help.memberFreezeIncome(memberid)
+        // 冻结奖金总额
+        result.bonusFreeze = yield models.dmd_income.memberFreezeBonus(memberid)
+        result.moneyApply = yield models.dmd_apply_help.applyTotalMoney(memberid)
+        return result
+    })
+    .then(m => util.success(res, m))
+    .catch(error => util.fail(req, res, error))
 }

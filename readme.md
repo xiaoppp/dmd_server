@@ -1,6 +1,9 @@
 ## start & run
 npm start -> it will start nodemon and restart whenever you changed anything
 
+## aliyun nodejs sdk
+https://github.com/aliyun-UED/aliyun-sdk-js
+
 for test purpose
 - http://localhost:3000
 - http://localhost:3000/top/onsaleitems

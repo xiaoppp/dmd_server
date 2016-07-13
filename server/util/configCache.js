@@ -13,7 +13,7 @@ function findConfig() {
             cache = c
         })
 
-    setTimeout(findConfig, 1000 * 5 * 60)
+    setTimeout(findConfig, 1000 * 1 * 60)
 }
 
 let configCache = {

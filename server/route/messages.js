@@ -14,25 +14,38 @@ module.exports = function(server) {
     server.get('/api/messages/reply/:memberid', replyMessages)
 
     server.get('/api/message/:id', findMessagesById)
-    server.post('/api/message/action/leavemsg/:memberid', restify.bodyParser({multipartFileHandler: uploadPicture}), upload)
+    server.post('/api/message/action/leavemsg/:memberid', restify.bodyParser({
+        multipartFileHandler: uploadPicture
+    }), upload)
 }
 
 const findMessagesList = (req, res, next) => {
     const to_member_id = req.params.memberid
     const page = req.params.page - 1
-
     const size = config.pagination.size
 
-    models.dmd_message
-        .findAndCountAll({
-            where: {
-                to_member_id: to_member_id
-            },
-            limit: size,
-            offset: size * page
-        })
-        .then(m => util.success(res, m))
-        .catch(error => util.fail(req, res, error))
+    console.log(page, "===========")
+    if (page === -1) {
+        models.dmd_message
+            .findAndCountAll({
+                where: {
+                    to_member_id: to_member_id
+                }
+            })
+            .then(m => util.success(res, m))
+            .catch(error => util.fail(req, res, error))
+    } else {
+        models.dmd_message
+            .findAndCountAll({
+                where: {
+                    to_member_id: to_member_id
+                },
+                limit: size,
+                offset: size * page
+            })
+            .then(m => util.success(res, m))
+            .catch(error => util.fail(req, res, error))
+    }
 }
 
 const replyMessages = (req, res, next) => {

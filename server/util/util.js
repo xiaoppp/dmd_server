@@ -1,6 +1,7 @@
 const crypto = require('crypto')
 const log = require('./log')
 const request = require('request')
+const urlencode = require('urlencode')
 
 const getMD5 = (mobile) => {
     console.log(mobile)
@@ -17,8 +18,12 @@ function getRandomInt(min, max) {
 }
 
 const fail = (req, res, errorMessage, code) => {
-    log.error({req: req}, 'error request');
-    log.error({res: res}, errorMessage)
+    log.error({
+        req: req
+    }, 'error request');
+    log.error({
+        res: res
+    }, errorMessage)
 
     console.log(errorMessage)
 
@@ -42,19 +47,22 @@ const success = (res, data) => {
     res.send(message)
 }
 
-const sendSMS = () => {
+const c = require('./util/util')
+c.sendSMS(['13610857121'], "多米多欢迎你", (m) => console.log(m))
+
+const sendSMS = (mobiles, text, fn) => {
     const Uid = "duomiduo"
     const key = "72d9200fb6db26aea474"
-    const smsMob = "13610857121"
-    const smsText = "测试一下发送给我自己"
-    let url = "http://utf8.sms.webchinese.cn/?Uid=" + Uid + "&Key=" + key + "&smsMob=" + smsMob + "&smsText=" + smsText
-    request
-        .get(url)
-        .on('response', function(response) {
-            console.log(response)
-            console.log(response.statusCode) // 200
-            console.log(response.headers['content-type']) // 'image/png'
+    const smsText = urlencode(text)
+
+    mobiles.forEach(m => {
+        let url = "http://utf8.sms.webchinese.cn/?Uid=duomiduo&Key=72d9200fb6db26aea474&smsMob=" + m + "&smsText=" + smsText
+        request(url, function(error, response, body) {
+            if (!error && response.statusCode == 200) {
+                fn(body)
+            }
         })
+    })
 }
 
 const util = {

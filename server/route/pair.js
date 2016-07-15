@@ -28,7 +28,7 @@ module.exports = function(server) {
 }
 
 const denyPayment = (req, res, next) => {
-    const memberid = req.params.memberid
+    const memberid = req.memberid
     models.dmd_members.freezeMember(memberid, "拒绝打款")
         .then(m => util.success(res, m))
         .catch(error => util.fail(req, res, error))
@@ -53,6 +53,8 @@ const payIn = (req, res, next) => {
 }
 
 const uploadPicture = (part, req, res, next) => {
+    console.log(part)
+
     const dirs = "/var/www/html/images/payment"
     const filename = part.filename
     const dir = path.join(dirs, filename)
@@ -78,6 +80,9 @@ const payOut = (req, res, next) => {
     const pairid = req.params.oaid
     const memberid = req.params.memberid
     const url = req.params.imgurl
+    console.log(req.params.oaid)
+    console.log(req.params.memberid)
+    console.log(req.params.imgurl)
     co(function*() {
         const pair = yield models.dmd_offer_apply.findOne({
             where: {
@@ -88,7 +93,7 @@ const payOut = (req, res, next) => {
         })
 
         pair.state = 3
-        pair.img = imgurl
+        pair.img = url
         pair.pay_time = moment().unix()
         yield pair.save()
 

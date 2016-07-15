@@ -4,14 +4,15 @@ const moment = require('moment')
 const restify = require('restify')
 const models = require('../mysql/index')
 const util = require('../util/util')
+const verifyToken = require('../middlewares/restifyToken')
 
 module.exports = function(server) {
-    server.get('/api/index/info/:memberid', fetchMemberInfo)
-    server.get('/api/index/refresh/:memberid', refresh)
+    server.get('/api/index/info', verifyToken, fetchMemberInfo)
+    server.get('/api/index/refresh', verifyToken, refresh)
 }
 
 const fetchMemberInfo = (req, res, next) => {
-    const memberid = req.params.memberid
+    const memberid = req.memberid
 
     co(function*() {
             let result = {
@@ -59,7 +60,7 @@ const fetchMemberInfo = (req, res, next) => {
 }
 
 const refresh = (req, res, next) => {
-    const memberid = req.params.memberid
+    const memberid = req.memberid
 
     co(function*() {
         let result = {}

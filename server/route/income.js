@@ -5,11 +5,12 @@ const restify = require('restify')
 const models = require('../mysql/index')
 const util = require('../util/util')
 const config = require('../config/config')
+const verifyToken = require('../middlewares/restifyToken')
 
 module.exports = function(server) {
-    server.get('/api/income/money/:memberid/:page', findMoney)
-    server.get('/api/income/bonus/:memberid/:page', findBonus)
-    server.get('/api/income/interest/:memberid/:page', findInterest)
+    server.get('/api/income/money/:page', verifyToken, findMoney)
+    server.get('/api/income/bonus/:page', verifyToken, findBonus)
+    server.get('/api/income/interest/:page', verifyToken, findInterest)
 
     //server.post('/api/income/receipt/:incomeid', restify.bodyParser({multipartFileHandler: upload}), uploadReceipt)
 }
@@ -25,7 +26,7 @@ const upload = (part, req, res, next) => {
 }
 
 const findMoney = (req,res,next) => {
-    const memberid = req.params.memberid
+    const memberid = req.memberid
     const page = req.params.page - 1
     findIncome(memberid, page, "money")
     .then(m => {
@@ -35,7 +36,7 @@ const findMoney = (req,res,next) => {
 }
 
 const findBonus = (req,res,next) => {
-    const memberid = req.params.memberid
+    const memberid = req.memberid
     const page = req.params.page - 1
     findIncome(memberid, page, "bonus")
     .then(m => {
@@ -45,7 +46,7 @@ const findBonus = (req,res,next) => {
 }
 
 const findInterest = (req,res,next) => {
-    const memberid = req.params.memberid
+    const memberid = req.memberid
     const page = req.params.page - 1
     findIncome(memberid, page, "interest")
     .then(m => {

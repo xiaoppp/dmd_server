@@ -4,39 +4,40 @@ const moment = require('moment')
 const restify = require('restify')
 const models = require('../mysql/index')
 const util = require('../util/util')
+const verifyToken = require('../middlewares/restifyToken')
 
 module.exports = function(server) {
-    server.get('/api/member/info/:id', findMemberById)
-    server.get('/api/member/:username', findMemberByName)
+    server.get('/api/member/info/:id', verifyToken, findMemberById)
+    server.get('/api/member/:username', verifyToken, findMemberByName)
     //mobile是否重复
-    server.get('/api/member/check/:mobile', checkMobile)
+    server.get('/api/member/check/:mobile', verifyToken, checkMobile)
 
     //是否是首单新用户
-    server.get('/api/member/check/new/:memberid', checkFirst)
+    server.get('/api/member/check/new', verifyToken, checkFirst)
     //下级人数
-    server.get('/api/member/children/amount/:memberid', findChildrenAmount)
+    server.get('/api/member/children/amount', verifyToken, findChildrenAmount)
     //所有下级teamids
-    server.get('/api/member/children/:parentid', findChildrenByParentId)
+    server.get('/api/member/children/:parentid', verifyToken, findChildrenByParentId)
 
-    server.post('/api/member/pwd/reset', restify.jsonBodyParser(), resetPwd)
-    server.post('/api/member/paypwd/reset', restify.jsonBodyParser(), resetPaypwd)
-    server.post('/api/member/smspwd/reset', restify.jsonBodyParser(), resetSmspwd)
+    server.post('/api/member/pwd/reset', verifyToken, restify.jsonBodyParser(), resetPwd)
+    server.post('/api/member/paypwd/reset', verifyToken, restify.jsonBodyParser(), resetPaypwd)
+    server.post('/api/member/smspwd/reset', verifyToken, restify.jsonBodyParser(), resetSmspwd)
 
     server.post('/api/member/signin', restify.jsonBodyParser(), signin)
     server.post('/api/member/signout', restify.jsonBodyParser(), signout)
     server.post('/api/member/signup', restify.jsonBodyParser(), signup)
     //修改会员资料
-    server.post('/api/member/edit/info', restify.jsonBodyParser(), updateMember)
+    server.post('/api/member/edit/info', verifyToken, restify.jsonBodyParser(), updateMember)
 }
 
 const checkFirst = (req, res, next) => {
-    models.dmd_members.isNewMember(req.params.memberid)
+    models.dmd_members.isNewMember(req.memberid)
         .then(m => util.success(res, m))
         .catch(error => util.fail(req, res, error))
 }
 
 const findChildrenAmount = (req, res, next) => {
-    const memberid = req.params.memberid
+    const memberid = req.memberid
     models.dmd_members.findChildrenAmount(memberid)
         .then(m => {
             util.success(res, m)}
@@ -45,7 +46,7 @@ const findChildrenAmount = (req, res, next) => {
 }
 
 const findMemberById = (req, res, next) => {
-    const memberid = req.params.id
+    const memberid = req.memberid
     models.dmd_members.findById(memberid, {
             attributes: {
                 include: ['mobile', 'truename']
@@ -249,7 +250,7 @@ const updateMember = (req, res, next) => {
 }
 
 const resetPwd = (req, res, next) => {
-    let memberid = req.params.memberid
+    let memberid = req.memberid
     let oldpwd = req.params.oldpwd
     let pwd = req.params.pwd
     let repwd = req.params.repwd
@@ -287,7 +288,7 @@ const resetPwd = (req, res, next) => {
 }
 
 const resetPaypwd = (req, res, next) => {
-    let memberid = req.params.memberid
+    let memberid = req.memberid
     let repaypwd = req.params.repaypwd
     let paypwd = req.params.paypwd
 

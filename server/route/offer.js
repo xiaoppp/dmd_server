@@ -4,19 +4,20 @@ const moment = require('moment')
 const models = require('../mysql/index')
 const util = require('../util/util')
 const restify = require('restify')
+const verifyToken = require('../middlewares/restifyToken')
 
 module.exports = function(server) {
     server.get('/api/offers/:memberid', findMemberOffers)
 
-    server.post('/api/offer/detail', restify.jsonBodyParser(), findOfferDetail)
+    server.post('/api/offer/detail', verifyToken, restify.jsonBodyParser(), findOfferDetail)
 
-    server.post('/api/offer/member', restify.jsonBodyParser(), offer)
+    server.post('/api/offer/member', verifyToken, restify.jsonBodyParser(), offer)
     //查看是否可以播种
-    server.post('/api/offer/member/check', restify.jsonBodyParser(), checkOffer)
+    server.post('/api/offer/member/check', verifyToken, restify.jsonBodyParser(), checkOffer)
 }
 
 const findMemberOffers = (req, res, next) => {
-    const memberid = req.params.memberid
+    const memberid = req.memberid
     co(function*() {
         const member = yield models.dmd_members.findById(memberid)
         const orderby = member.type == 1 ? ['state', 'asc'] : ['the_time', 'desc']
@@ -46,7 +47,7 @@ const findMemberOffers = (req, res, next) => {
 
 const findOfferDetail = (req, res, next) => {
     const offerid = req.params.offerid
-    const memberid = req.params.memberid
+    const memberid = req.memberid
     //const applyMemberid = req.params.amid
 
     co(function*() {
@@ -77,7 +78,7 @@ const findOfferDetail = (req, res, next) => {
 
 const checkOffer = (req, res, next) => {
     const money = Number(req.params.money)
-    const memberid = req.params.memberid
+    const memberid = req.memberid
 
     co(function*() {
         const member = yield models.dmd_members.findById(memberid)

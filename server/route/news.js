@@ -4,10 +4,11 @@ const models = require('../mysql/index')
 const config = require('../config/config.json')
 const util = require('../util/util')
 const restify = require('restify')
+const verifyToken = require('../middlewares/restifyToken')
 
 module.exports = function(server) {
-    server.get('/api/news/page/:page', findNewsList)
-    server.get('/api/news/:newsid', findNewsById)
+    server.get('/api/news/page/:page', verifyToken, findNewsList)
+    server.get('/api/news/:newsid', verifyToken, findNewsById)
 }
 
 const findNewsById = (req, res, next) => {

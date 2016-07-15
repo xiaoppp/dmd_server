@@ -7,20 +7,21 @@ const restify = require('restify')
 const moment = require('moment')
 const path = require('path')
 const fs = require('fs')
+const verifyToken = require('../middlewares/restifyToken')
 
 
 module.exports = function(server) {
-    server.get('/api/messages/page/:memberid/:page', findMessagesList)
-    server.get('/api/messages/reply/:memberid', replyMessages)
+    server.get('/api/messages/page/:memberid/:page', verifyToken, findMessagesList)
+    server.get('/api/messages/reply', verifyToken, replyMessages)
 
-    server.get('/api/message/:id', findMessagesById)
-    server.post('/api/message/action/leavemsg/:memberid', restify.bodyParser({
+    server.get('/api/message/:id', verifyToken, findMessagesById)
+    server.post('/api/message/action/leavemsg', verifyToken, restify.bodyParser({
         multipartFileHandler: uploadPicture
     }), upload)
 }
 
 const findMessagesList = (req, res, next) => {
-    const to_member_id = req.params.memberid
+    const to_member_id = req.memberid
     const page = req.params.page - 1
     const size = config.pagination.size
 
@@ -49,7 +50,7 @@ const findMessagesList = (req, res, next) => {
 }
 
 const replyMessages = (req, res, next) => {
-    const member_id = req.params.memberid
+    const member_id = req.memberid
 
     co(function*() {
             const messages = yield models.dmd_message.findAll({
@@ -101,7 +102,7 @@ const uploadPicture = (part, req, res, next) => {
     const filename = part.filename
 
     const fileExt = filename.split('.').pop();
-    const files = req.params.memberid + "_" + moment().format('YYYYMMDDhhmmss') + '.' + fileExt
+    const files = req.memberid + "_" + moment().format('YYYYMMDDhhmmss') + '.' + fileExt
 
     const dir = path.join(__dirname, dirs, files)
     const writter = fs.createWriteStream(dir)

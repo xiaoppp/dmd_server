@@ -4,20 +4,21 @@ const restify = require('restify')
 const moment = require('moment')
 const models = require('../mysql/index')
 const util = require('../util/util')
+const verifyToken = require('../middlewares/restifyToken')
 
 module.exports = function(server) {
-    server.get('/api/applys/:memberid', findMemberApplys)
+    server.get('/api/applys', verifyToken, findMemberApplys)
 
-    server.post('/api/apply/detail', restify.jsonBodyParser(), findApplyDetail)
+    server.post('/api/apply/detail', verifyToken, restify.jsonBodyParser(), findApplyDetail)
     //收获
-    server.post('/api/apply/member', restify.jsonBodyParser(), apply)
+    server.post('/api/apply/member', verifyToken, restify.jsonBodyParser(), apply)
     //检查是否可以收获
-    server.post('/api/apply/member/check', restify.jsonBodyParser(), checkApply)
+    server.post('/api/apply/member/check', verifyToken, restify.jsonBodyParser(), checkApply)
 }
 
 const findApplyDetail = (req, res, next) => {
     const applyid = req.params.applyid
-    const memberid = req.params.memberid
+    const memberid = req.memberid
     //const offerMemberid = req.params.omid
 
     co(function*() {
@@ -47,7 +48,7 @@ const findApplyDetail = (req, res, next) => {
 }
 
 const findMemberApplys = (req, res, next) => {
-    const memberid = req.params.memberid
+    const memberid = req.memberid
     co(function*() {
         const member = yield models.dmd_members.findById(memberid)
         const orderby = member.type == 1 ? ['state', 'asc'] : ['the_time', 'desc']
@@ -77,7 +78,7 @@ const findMemberApplys = (req, res, next) => {
 
 const checkApply = (req, res, next) => {
     const money = Number(req.params.money)
-    const memberid = req.params.memberid
+    const memberid = req.memberid
 
     co(function*() {
         const member = yield models.dmd_members.findById(memberid)
@@ -97,7 +98,7 @@ const checkApply = (req, res, next) => {
 
 const apply = (req, res, next) => {
     const money = Number(req.params.money)
-    const memberid = req.params.memberid
+    const memberid = req.memberid
 
     co(function*() {
         const member = yield models.dmd_members.findById(memberid)

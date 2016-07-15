@@ -47,6 +47,9 @@ server.use(restify.gzipResponse())
 //server.use(restify.queryParser());
 //server.use(restify.jsonp());
 
+const c = require('./util/util')
+c.sendSMS()
+
 server.use(function logger(req, res, next) {
     console.log(new Date(), req.method, req.url)
     log.info(new Date(), req.method, req.url)
@@ -61,8 +64,5 @@ server.on('uncaughtException', function(req, res, route, error) {
 
 server.listen(3000, function() {
     console.log(moment().format())
-
-    //log.info("server started at: " + moment().format())
-    //log.error("server started at: " + moment().format())
     console.log('%s listening at %s', server.name, server.url)
 })

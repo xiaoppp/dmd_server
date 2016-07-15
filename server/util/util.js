@@ -1,5 +1,6 @@
 const crypto = require('crypto')
 const log = require('./log')
+const request = require('request')
 
 const getMD5 = (mobile) => {
     console.log(mobile)
@@ -41,11 +42,27 @@ const success = (res, data) => {
     res.send(message)
 }
 
+const sendSMS = () => {
+    const Uid = "duomiduo"
+    const key = "72d9200fb6db26aea474"
+    const smsMob = "13610857121"
+    const smsText = "测试一下发送给我自己"
+    let url = "http://utf8.sms.webchinese.cn/?Uid=" + Uid + "&Key=" + key + "&smsMob=" + smsMob + "&smsText=" + smsText
+    request
+        .get(url)
+        .on('response', function(response) {
+            console.log(response)
+            console.log(response.statusCode) // 200
+            console.log(response.headers['content-type']) // 'image/png'
+        })
+}
+
 const util = {
     getMD5: getMD5,
     success: success,
     fail: fail,
-    getRandomInt: getRandomInt
+    getRandomInt: getRandomInt,
+    sendSMS: sendSMS
 }
 
 module.exports = util

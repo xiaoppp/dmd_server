@@ -4,6 +4,7 @@ const moment = require('moment')
 const restify = require('restify')
 const models = require('../mysql/index')
 const util = require('../util/util')
+const auth = require('../util/auth')
 const verifyToken = require('../middlewares/restifyToken')
 
 module.exports = function(server) {
@@ -172,7 +173,7 @@ const signin = (req, res, next) => {
                 yield member.save()
                 return {
                     memberid: member.id,
-                    token: null
+                    token: auth.getToken()
                 }
             } else {
                 yield Promise.reject('账号或密码错误');

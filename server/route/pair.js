@@ -7,24 +7,25 @@ const config = require('../config/config')
 const restify = require('restify')
 const path = require('path')
 const fs = require('fs')
+const verifyToken = require('../middlewares/restifyToken')
 
 module.exports = function(server) {
     // 失败匹配
-    server.get('/api/pairs/failed/:memberid', findMemberFailedPairs)
+    server.get('/api/pairs/failed',verifyToken, findMemberFailedPairs)
 
     // 仲裁结果 申请投诉 撤销
-    server.post('/api/pairs/judge', restify.jsonBodyParser(), judge)
+    server.post('/api/pairs/judge', verifyToken,restify.jsonBodyParser(), judge)
 
-    server.post('/api/pairs/remark', restify.jsonBodyParser(), remark)
+    server.post('/api/pairs/remark', verifyToken,restify.jsonBodyParser(), remark)
 
-    server.get('/api/pair/payment/deny/:memberid', denyPayment)
+    server.get('/api/pair/payment/deny', verifyToken,denyPayment)
 
-    server.post('/api/pair/payment/mobile/upload', restify.bodyParser({multipartFileHandler: uploadPicture}), upload)
+    server.post('/api/pair/payment/mobile/upload', verifyToken,restify.bodyParser({multipartFileHandler: uploadPicture}), upload)
 
     //打款
-    server.post('/api/pair/payment/out', restify.jsonBodyParser(), payOut)
+    server.post('/api/pair/payment/out', verifyToken,restify.jsonBodyParser(), payOut)
     //收款
-    server.post('/api/pair/payment/in', restify.jsonBodyParser(), payIn)
+    server.post('/api/pair/payment/in', verifyToken,restify.jsonBodyParser(), payIn)
 }
 
 const denyPayment = (req, res, next) => {
@@ -78,10 +79,10 @@ const upload = (req, res, next) => {
 
 const payOut = (req, res, next) => {
     const pairid = req.params.oaid
-    const memberid = req.params.memberid
+    const memberid = req.memberid
     const url = req.params.imgurl
     console.log(req.params.oaid)
-    console.log(req.params.memberid)
+    console.log(req.memberid)
     console.log(req.params.imgurl)
     co(function*() {
         const pair = yield models.dmd_offer_apply.findOne({
@@ -113,7 +114,7 @@ const payOut = (req, res, next) => {
 }
 
 const findMemberFailedPairs = (req, res, next) => {
-    const memberid = req.params.memberid
+    const memberid = req.memberid
     co(function*() {
             const member = yield models.dmd_members.findById(memberid)
             const orderby = member.type == 1 ? ['state', 'asc'] : ['the_time', 'desc']
@@ -150,7 +151,7 @@ const findMemberFailedPairs = (req, res, next) => {
 
 const judge = (req, res, next) => {
     const oaid = req.params.oaid
-    const memberid = req.params.memberid
+    const memberid = req.memberid
     const judge = req.params.judge
 
     co(function*() {

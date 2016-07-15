@@ -2,8 +2,8 @@
     "dev": {
         "username": "root",
         "password": "",
-        "database": "dmd20160709",
-        "host": "192.168.1.105",
+        "database": "dmd_web",
+        "host": "192.168.1.107",
         "dialect": "mysql"
     },
     "product": {

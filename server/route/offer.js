@@ -7,7 +7,7 @@ const restify = require('restify')
 const verifyToken = require('../middlewares/restifyToken')
 
 module.exports = function(server) {
-    server.get('/api/offers/:memberid', findMemberOffers)
+    server.get('/api/offers',verifyToken, findMemberOffers)
 
     server.post('/api/offer/detail', verifyToken, restify.jsonBodyParser(), findOfferDetail)
 
@@ -98,7 +98,7 @@ const checkOffer = (req, res, next) => {
 
 const offer = (req, res, next) => {
     const money = Number(req.params.money)
-    const memberid = req.params.memberid
+    const memberid = req.memberid
 
     co(function*(){
         const member = yield models.dmd_members.findById(memberid)

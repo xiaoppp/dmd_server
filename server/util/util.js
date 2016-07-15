@@ -1,3 +1,4 @@
+'use strict'
 const crypto = require('crypto')
 const log = require('./log')
 const request = require('request')
@@ -47,8 +48,8 @@ const success = (res, data) => {
     res.send(message)
 }
 
-const c = require('./util/util')
-c.sendSMS(['13610857121'], "多米多欢迎你", (m) => console.log(m))
+//const c = require('./util/util')
+//util.sendSMS(['13610857121'], "多米多欢迎你", (m) => console.log(m))
 
 const sendSMS = (mobiles, text, fn) => {
     const Uid = "duomiduo"

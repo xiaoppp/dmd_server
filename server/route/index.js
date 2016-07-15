@@ -13,7 +13,9 @@ module.exports = function(server) {
 
 const fetchMemberInfo = (req, res, next) => {
     const memberid = req.memberid
-
+    
+    console.log('=================memberid//',memberid)
+    
     co(function*() {
             let result = {
                 showNews: true

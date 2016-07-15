@@ -47,8 +47,8 @@ server.use(restify.gzipResponse())
 //server.use(restify.queryParser());
 //server.use(restify.jsonp());
 
-const c = require('./util/util')
-c.sendSMS()
+//const c = require('./util/util')
+//c.sendSMS()
 
 server.use(function logger(req, res, next) {
     console.log(new Date(), req.method, req.url)

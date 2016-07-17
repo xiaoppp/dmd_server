@@ -9,7 +9,7 @@
     "product": {
         "username": "duomiduo",
         "password": "Duomiduo123!@#",
-        "database": "duomiduo1",
+        "database": "duomiduo2",
         "host": "rm-bp145d8j3uo7306kv.mysql.rds.aliyuncs.com",
         "dialect": "mysql"
     },

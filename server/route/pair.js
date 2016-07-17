@@ -107,6 +107,8 @@ const payOut = (req, res, next) => {
             img: req.filespath
         })
 
+        //util.sendSMSForPayment(pair.am_id)
+
         return pair
     })
     .then(m => util.success(res, m))

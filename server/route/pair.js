@@ -53,30 +53,6 @@ const payIn = (req, res, next) => {
     .catch(error => util.fail(req, res, error))
 }
 
-const uploadPicture = (part, req, res, next) => {
-    console.log(part)
-
-    const dirs = "/var/www/html/images/payment"
-    const filename = part.filename
-    const dir = path.join(dirs, filename)
-    const writter = fs.createWriteStream(dir)
-
-    if (part.mime === "image/png" || part.mime === "image/jpg" || part.mime === "image/jpeg" || part.mime === "image/gif") {
-        part.pipe(writter)
-    }
-    req.filespath = filename
-    console.log(filename)
-}
-
-const upload = (req, res, next) => {
-    console.log(req.filespath)
-    if (req.filespath) {
-        util.success(res, req.filespath)
-    }else {
-        util.fail(req, res, error)
-    }
-}
-
 const payOut = (req, res, next) => {
     const pairid = req.params.oaid
     const memberid = req.memberid
@@ -163,6 +139,30 @@ const judge = (req, res, next) => {
         })
         .then(m => util.success(res, m))
         .catch(error => util.fail(req, res, error))
+}
+
+const uploadPicture = (part, req, res, next) => {
+    console.log(part)
+
+    const dirs = "/var/www/html/images/payment"
+    const filename = part.filename
+    const dir = path.join(dirs, filename)
+    const writter = fs.createWriteStream(dir)
+
+    if (part.mime === "image/png" || part.mime === "image/jpg" || part.mime === "image/jpeg" || part.mime === "image/gif") {
+        part.pipe(writter)
+    }
+    req.filespath = filename
+    console.log(filename)
+}
+
+const upload = (req, res, next) => {
+    console.log(req.filespath)
+    if (req.filespath) {
+        util.success(res, req.filespath)
+    }else {
+        util.fail(req, res, error)
+    }
 }
 
 const remark = (req, res, next) => {

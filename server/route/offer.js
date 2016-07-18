@@ -7,7 +7,7 @@ const restify = require('restify')
 const verifyToken = require('../middlewares/restifyToken')
 
 module.exports = function(server) {
-    server.get('/api/offers/:memberid', findMemberOffers)
+    server.get('/api/offers',verifyToken, findMemberOffers)
 
     server.post('/api/offer/detail', verifyToken, restify.jsonBodyParser(), findOfferDetail)
 
@@ -98,7 +98,7 @@ const checkOffer = (req, res, next) => {
 
 const offer = (req, res, next) => {
     const money = Number(req.params.money)
-    const memberid = req.params.memberid
+    const memberid = req.memberid
 
     co(function*(){
         const member = yield models.dmd_members.findById(memberid)
@@ -117,6 +117,7 @@ const offer = (req, res, next) => {
         if (lastoffer.state < 100 && member.the_time < member.reg_time) { //首单
             yield addFirstOffer(money, member, lastoffer)
         }
+
         return offer
     })
     .then(m => util.success(res, m))
@@ -133,25 +134,25 @@ function addFirstOffer(money, member, offer) {
             }
         })
         const ran = util.getRandomInt(0, members.length)
-        const offerMember = members[ran]
+        const applyMember = members[ran]
 
         const the_time = moment().unix()
 
         const apply = yield models.dmd_apply_help.create({
-            member_id: offerMember.id,
+            member_id: applyMember.id,
             money: money,
             the_time: the_time,
-            code: "A" + offerMember.id + the_time,
+            code: "A" + applyMember.id + the_time,
             type: "money"
         })
 
         const pair = yield models.dmd_offer_apply.create({
             the_time: the_time,
-            code: "OA" + member.id + offerMember.id + the_time,
+            code: "OA" + member.id + applyMember.id + the_time,
             oid: offer.id,
             aid: apply.id,
             om_id: member.id,
-            am_id: offerMember.id,
+            am_id: applyMember.id,
             money: money
         })
 
@@ -161,6 +162,8 @@ function addFirstOffer(money, member, offer) {
 
         apply.state = 2
         yield apply.save()
+
+        //util.sendSMSForOffer(member.id)
     })
 }
 

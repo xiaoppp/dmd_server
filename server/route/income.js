@@ -66,7 +66,7 @@ const findIncome = (memberid, page, type) => {
             sql = "select * from dmd_income where member_id = " + memberid +
             " and type = '" + type + "'" +
             " and (intro not like '%您的第%级下属%' or intro like '%您的第1级下属%' or intro like '%您的第2级下属%') " +
-            "order by the_time desc"
+            "order by the_time desc limit 100"
         }
         else {
             const offset = size * page

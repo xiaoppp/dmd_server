@@ -11,7 +11,7 @@ const verifyToken = require('../middlewares/restifyToken')
 
 
 module.exports = function(server) {
-    server.get('/api/messages/page/:memberid/:page', verifyToken, findMessagesList)
+    server.get('/api/messages/page/:page', verifyToken, findMessagesList)
     server.get('/api/messages/reply', verifyToken, replyMessages)
 
     server.get('/api/message/:id', verifyToken, findMessagesById)

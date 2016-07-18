@@ -13,7 +13,9 @@ module.exports = function(server) {
 
 const fetchMemberInfo = (req, res, next) => {
     const memberid = req.memberid
-
+    
+    console.log('=================memberid//',memberid)
+    
     co(function*() {
             let result = {
                 showNews: true
@@ -36,14 +38,16 @@ const fetchMemberInfo = (req, res, next) => {
 
             // 取最后的播种总单
             result.lastOffer = yield models.dmd_offer_help.lastestOffer(memberid)
-            if (result.offer) {
-                result.offerPairs = yield result.offer.getPairs()
+            if (result.lastOffer) {
+                let pairs = yield result.lastOffer.getPairs()
+                result.lastOffer.setDataValue('pairs',pairs)
             }
 
             // 取最后的收获总单
             result.lastApply = yield models.dmd_apply_help.lastestApply(memberid)
-            if (result.apply) {
-                result.applyPairs = yield result.apply.getPairs()
+            if (result.lastApply) {
+                let pairs = yield result.lastApply.getPairs()
+                result.lastApply.setDataValue('pairs',pairs)
             }
 
             // 冻结本金总额

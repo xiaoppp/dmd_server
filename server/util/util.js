@@ -1,3 +1,4 @@
+'use strict'
 const crypto = require('crypto')
 const log = require('./log')
 const request = require('request')
@@ -47,8 +48,9 @@ const success = (res, data) => {
     res.send(message)
 }
 
-const c = require('./util/util')
-c.sendSMS(['13610857121'], "多米多欢迎你", (m) => console.log(m))
+//const c = require('./util/util')
+//util.sendSMS(['13610857121'], "多米多欢迎你", (m) => console.log(m))
+//const canSendSMS = false
 
 const sendSMS = (mobiles, text, fn) => {
     const Uid = "duomiduo"
@@ -65,12 +67,54 @@ const sendSMS = (mobiles, text, fn) => {
     })
 }
 
+//to is the id of a member.
+const sendSMSForPayment = (to) => {
+    let canSendSMS = models.dmd_config.getConfig(11)
+    if(canSendSMS == 1){
+        let overTimeToReceipt = models.dmd_config.getConfig(13)
+        let toMember = models.dmd_members.findById(to)
+        let msg = "尊敬的会员" + toMember.nickname + 
+                    "您好！您的申请帮助对方已经打款成功，请在" + overTimeToReceipt + 
+                    "小时内进行确认收款操作！超出时间会被封号！"
+        sendSMS([toMember.mobile], msg, function(res){
+            console.log('...sms...sendSMSForPayment//', res)
+        })
+    }
+}
+
+//to is the id of a member.
+const sendSMSForOffer = (to) => {
+    let canSendSMS = models.dmd_config.getConfig(11)
+    if(canSendSMS == 1){
+        let overTimeToPay = models.dmd_config.getConfig(12)
+        let toMember = models.dmd_members.findById(to)
+        let msg = "尊敬的会员" + toMember.nickname + 
+                    "您好！您的提供帮助订单已匹配成功，请您尽快登录系统查看详细信息！请尽量在" + overTimeToPay + 
+                    "小时内进行操作！超出时间会被封号！"
+        sendSMS([toMember.mobile], msg, function(res){
+            console.log('...sms...sendSMSForPayment//', res)
+        })
+    }
+}
+
+//to is the id of a member.
+const sendSMSForRegister = (to) => {
+}
+
+//to is the id of a member.
+const sendSMSForAutoMatch = (to) => {
+}
+
 const util = {
     getMD5: getMD5,
     success: success,
     fail: fail,
     getRandomInt: getRandomInt,
-    sendSMS: sendSMS
+    sendSMS: sendSMS,
+    sendSMSForPayment: sendSMSForPayment,
+    sendSMSForOffer : sendSMSForOffer,
+    sendSMSForRegister : sendSMSForRegister,
+    sendSMSForAutoMatch : sendSMSForAutoMatch
 }
 
 module.exports = util

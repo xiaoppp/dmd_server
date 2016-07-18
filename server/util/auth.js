@@ -7,7 +7,7 @@ const moment = require('moment')
 // generate new token and set to token cache
 // userid = 803213706
 const getToken = (userid) => {
-    userid = 803213706
+    //userid = 803213706
     // iss: 该JWT的签发者
     // sub: 该JWT所面向的用户
     // aud: 接收该JWT的一方

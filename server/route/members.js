@@ -97,7 +97,7 @@ const findChildrenByParentId = (req, res, next) => {
 
 const checkMobile = (req, res, next) => {
     const mobile = req.params.mobile
-    let message = util.APIResult()
+    //let message = util.APIResult()
 
     models.dmd_members
         .count({
@@ -116,7 +116,7 @@ const checkMobile = (req, res, next) => {
 
 const signup = (req, res, next) => {
     const refer = req.params.refer
-    let message = util.APIResult()
+    //let message = util.APIResult()
 
     co(function*() {
             let parent = yield models.dmd_members.findOne({
@@ -173,7 +173,7 @@ const signin = (req, res, next) => {
                 yield member.save()
                 return {
                     memberid: member.id,
-                    token: auth.getToken()
+                    token: auth.getToken(member.id)
                 }
             } else {
                 yield Promise.reject('账号或密码错误');

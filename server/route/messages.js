@@ -1,7 +1,7 @@
 "use strict"
 const co = require('co')
 const models = require('../mysql/index')
-const config = require('../config/config.json')
+const config = require('../config')
 const util = require('../util/util')
 const restify = require('restify')
 const moment = require('moment')

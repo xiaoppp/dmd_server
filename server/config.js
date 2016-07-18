@@ -1,4 +1,4 @@
-{
+const configuration = {
     "dev": {
         "username": "root",
         "password": "",
@@ -13,14 +13,12 @@
         "host": "rm-bp145d8j3uo7306kv.mysql.rds.aliyuncs.com",
         "dialect": "mysql"
     },
-    "cronjob": {
-        "username": "root",
-        "password": null,
-        "database": "duomiduo",
-        "host": "192.168.1.103",
-        "dialect": "mysql"
-    },
     "pagination": {
         "size": 12
     }
 }
+
+const env = "dev"
+const config = configuration[env]
+
+module.exports = config

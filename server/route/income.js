@@ -4,7 +4,7 @@ const moment = require('moment')
 const restify = require('restify')
 const models = require('../mysql/index')
 const util = require('../util/util')
-const config = require('../config/config')
+const config = require('../config')
 const verifyToken = require('../middlewares/restifyToken')
 
 module.exports = function(server) {

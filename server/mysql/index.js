@@ -5,23 +5,23 @@ const path = require("path")
 const Sequelize = require("sequelize")
 const log = require('../util/log')
 
-let argv = process.argv[2]
-console.log('============env', argv)
-if (argv !== 'product')
-    argv = 'dev'
-const config = require(path.join(__dirname, '..', 'config', 'config.json'))[argv];
+const config = require("../config")
 
-const sequelize = new Sequelize(config.database, config.username, config.password, {
-    host: config.host,
-    dialect: config.dialect,
-    timestamps: false,
-    //logging: log.info.bind(log),
-    pool: {
-        max: 100,
-        min: 0,
-        idle: 10000
-    }
-})
+const sequelize = new Sequelize(
+    config.database,
+    config.username,
+    config.password,
+    {
+        host: config.host,
+        dialect: config.dialect,
+        timestamps: false,
+        //logging: log.info.bind(log),
+        pool: {
+            max: 100,
+            min: 0,
+            idle: 10000
+        }
+    })
 
 sequelize
     .authenticate()

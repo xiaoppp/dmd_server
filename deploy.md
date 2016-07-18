@@ -18,3 +18,12 @@
   - apt-get install nginx
 
     - config nginx vim /etc/nginx/sites-available/default reference nginx_config
+
+5. deploy src code
+
+    - use flight plan if possible
+    - sftp by filezilla etc.
+
+6. change server config
+
+  - change config.js "env" value

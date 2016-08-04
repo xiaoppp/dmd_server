@@ -164,6 +164,26 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.INTEGER(1),
             allowNull: true,
             defaultValue: '0'
+        },
+        old_money: {
+            type: DataTypes.FLOAT,
+            allowNull: true,
+            defaultValue: '0.00'
+        },
+        old_interest: {
+            type: DataTypes.FLOAT,
+            allowNull: true,
+            defaultValue: '0.00'
+        },
+        old_bonus: {
+            type: DataTypes.FLOAT,
+            allowNull: true,
+            defaultValue: '0.00'
+        },
+        dmd_coin: {
+            type: DataTypes.INTEGER(10),
+            allowNull: true,
+            defaultValue: '0'
         }
     }
     , {

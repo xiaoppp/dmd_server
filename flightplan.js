@@ -10,7 +10,7 @@ plan.target('develop', {
 });
 
 plan.target('product', {
-    host: '112.124.15.7',
+    host: '120.26.138.240',
     username: 'root',
     agent: process.env.SSH_AUTH_SOCK,
     failsafe: true

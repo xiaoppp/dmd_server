@@ -58,4 +58,4 @@ https://github.com/node-schedule/node-schedule
 http://blog.fens.me/nodejs-cron-later/
 
 ## sequelize auto
-sequelize-auto -o "./gen_models" -h 192.168.1.103 -d duomiduo -u root -p 3306 --dialect mysql
+sequelize-auto -o "./gen_models" -h rm-bp145d8j3uo7306kv.mysql.rds.aliyuncs.com -d duomiduo -u duomiduo -p Duomiduo123!@# 3306 --dialect mysql

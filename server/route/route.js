@@ -5,13 +5,14 @@ module.exports = function (server) {
         res.send("welcome duomiduo backend api server...")
     });
 
-    require("./common")(server)
-    require("./index")(server)
-    require("./members")(server)
-    require("./news")(server)
-    require("./messages")(server)
-    require("./apply")(server)
-    require("./income")(server)
-    require("./offer")(server)
-    require("./pair")(server)
+    require("./exchange")(server)
+    // require("./common")(server)
+    // require("./index")(server)
+    // require("./members")(server)
+    // require("./news")(server)
+    // require("./messages")(server)
+    // require("./apply")(server)
+    // require("./income")(server)
+    // require("./offer")(server)
+    // require("./pair")(server)
 }

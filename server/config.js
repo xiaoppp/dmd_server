@@ -9,7 +9,7 @@ const configuration = {
     "product": {
         "username": "duomiduo",
         "password": "Duomiduo123!@#",
-        "database": "duomiduo2",
+        "database": "duomiduo",
         "host": "rm-bp145d8j3uo7306kv.mysql.rds.aliyuncs.com",
         "dialect": "mysql"
     },
@@ -18,7 +18,7 @@ const configuration = {
     }
 }
 
-const env = "dev"
+const env = "product"
 const config = configuration[env]
 
 module.exports = config

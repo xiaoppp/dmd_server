@@ -4,7 +4,7 @@ const models = require('../mysql/index')
 
 let cache = {}
 
-findConfig()
+//findConfig()
 
 function findConfig() {
     models.dmd_config
